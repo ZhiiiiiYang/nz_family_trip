@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>紐西蘭南北島・家族大旅行 V2</title>
+    <meta name="format-detection" content="telephone=no">
+    <title>紐西蘭南北島・家族大旅行</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -376,7 +377,11 @@
         }
     </script>
     <style>
-        body { background-color: #F9F7F2; -webkit-font-smoothing: antialiased; }
+        body { 
+            background-color: #F9F7F2; 
+            -webkit-font-smoothing: antialiased; 
+            -webkit-text-size-adjust: 100%;
+        }
         
         /* Important for Alpine loading state - prevents FOUC */
         [x-cloak] { display: none !important; }
@@ -413,9 +418,14 @@
         /* iOS Safe Area Padding */
         .safe-area-top { padding-top: env(safe-area-inset-top); }
         .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+        /* Ensure smooth scrolling on iOS for overflow containers */
+        .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 </head>
-<body class="text-nzDark pb-28 tap-highlight-transparent min-h-screen safe-area-bottom" x-data="itineraryApp" x-cloak>
+<body class="text-nzDark pb-28 tap-highlight-transparent min-h-[100dvh] safe-area-bottom overflow-x-hidden" x-data="itineraryApp" x-cloak>
 
     <!-- Header -->
     <header class="fixed top-0 w-full z-50 bg-nzCream/95 backdrop-blur-md border-b border-gray-100 px-6 transition-all duration-300 shadow-sm safe-area-top pt-4 pb-3">
@@ -432,7 +442,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="mt-32 px-4 max-w-2xl mx-auto safe-area-top pt-8">
+    <main class="mt-32 px-4 max-w-2xl mx-auto safe-area-top pt-8 overflow-x-hidden">
 
         <!-- Tab Navigation -->
         <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1 sticky top-[90px] z-40 bg-gradient-to-b from-[#F9F7F2] via-[#F9F7F2] to-transparent pt-2 px-1 -mx-1 safe-area-top">
@@ -497,20 +507,20 @@
                         
                         <!-- Card Header -->
                         <div @click="toggleDay(index)" class="p-5 flex justify-between items-center cursor-pointer active:bg-gray-50 transition-colors">
-                            <div class="flex items-center space-x-4">
-                                <div class="flex flex-col items-center justify-center bg-gray-100 w-14 h-14 rounded-2xl text-center shadow-inner" :class="{'bg-nzGreen text-white shadow-none': openDay === index}">
+                            <div class="flex items-center space-x-4 min-w-0"> <!-- Safari Fix: min-w-0 -->
+                                <div class="flex flex-col items-center justify-center bg-gray-100 w-14 h-14 rounded-2xl text-center shadow-inner flex-shrink-0" :class="{'bg-nzGreen text-white shadow-none': openDay === index}">
                                     <span class="text-[10px] uppercase font-bold tracking-wider" x-text="formatMonth(day.date)"></span>
                                     <span class="text-xl font-bold leading-none font-serif" x-text="formatDate(day.date)"></span>
                                 </div>
-                                <div>
-                                    <h3 class="font-bold text-gray-800 text-lg" x-text="day.title"></h3>
-                                    <p class="text-xs text-gray-500 mt-1 font-medium flex items-center">
-                                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-nzAccent mr-1.5"></span>
-                                        <span x-text="day.route"></span>
+                                <div class="min-w-0"> <!-- Safari Fix: min-w-0 -->
+                                    <h3 class="font-bold text-gray-800 text-lg truncate" x-text="day.title"></h3>
+                                    <p class="text-xs text-gray-500 mt-1 font-medium flex items-center truncate">
+                                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-nzAccent mr-1.5 flex-shrink-0"></span>
+                                        <span class="truncate" x-text="day.route"></span>
                                     </p>
                                 </div>
                             </div>
-                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition-transform duration-300" :class="{'rotate-180 bg-green-50 text-nzGreen': openDay === index}">
+                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition-transform duration-300 flex-shrink-0 ml-2" :class="{'rotate-180 bg-green-50 text-nzGreen': openDay === index}">
                                 <i class="fa-solid fa-chevron-down text-xs text-gray-400" :class="{'text-nzGreen': openDay === index}"></i>
                             </div>
                         </div>
@@ -537,19 +547,19 @@
                                             </div>
 
                                             <div class="flex justify-between items-start group">
-                                                <div class="pr-2">
-                                                    <h4 class="font-bold text-sm text-gray-800 leading-tight" x-text="item.name"></h4>
-                                                    <p class="text-xs text-gray-500 mt-1.5 leading-relaxed" x-text="item.desc"></p>
+                                                <div class="pr-2 min-w-0 flex-1"> <!-- Safari Fix: min-w-0 -->
+                                                    <h4 class="font-bold text-sm text-gray-800 leading-tight break-words" x-text="item.name"></h4>
+                                                    <p class="text-xs text-gray-500 mt-1.5 leading-relaxed break-words" x-text="item.desc"></p>
                                                     
                                                     <!-- AI Tip Tag -->
                                                     <div x-show="item.tip" class="mt-2.5 inline-flex items-start bg-amber-50 text-amber-800 text-[10px] px-2.5 py-1.5 rounded-lg border border-amber-100 max-w-full">
-                                                        <i class="fa-solid fa-lightbulb mr-1.5 mt-0.5 text-amber-500"></i> 
-                                                        <span class="font-medium" x-text="item.tip"></span>
+                                                        <i class="fa-solid fa-lightbulb mr-1.5 mt-0.5 text-amber-500 flex-shrink-0"></i> 
+                                                        <span class="font-medium break-words" x-text="item.tip"></span>
                                                     </div>
                                                 </div>
                                                 
                                                 <!-- Map Button -->
-                                                <a :href="getMapLink(item.name)" target="_blank" class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-nzGreen hover:text-white transition-all shadow-sm active:scale-95">
+                                                <a :href="getMapLink(item.name)" target="_blank" class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-nzGreen hover:text-white transition-all shadow-sm active:scale-95 ml-2">
                                                     <i class="fa-solid fa-location-arrow text-xs"></i>
                                                 </a>
                                             </div>
@@ -563,12 +573,12 @@
                                         <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500 mr-3 flex-shrink-0">
                                             <i class="fa-solid fa-bed text-xs"></i>
                                         </div>
-                                        <div class="flex-1">
+                                        <div class="flex-1 min-w-0"> <!-- Safari Fix: min-w-0 -->
                                             <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-wide mb-0.5">Tonight's Stay</div>
-                                            <div class="text-sm font-bold text-gray-800" x-text="day.stay"></div>
-                                            <div class="text-xs text-gray-500 mt-0.5" x-text="day.stayAddr"></div>
+                                            <div class="text-sm font-bold text-gray-800 truncate" x-text="day.stay"></div>
+                                            <div class="text-xs text-gray-500 mt-0.5 truncate" x-text="day.stayAddr"></div>
                                         </div>
-                                        <a x-show="day.stayAddr" :href="getMapLink(day.stayAddr)" target="_blank" class="text-xs font-bold text-indigo-600 bg-white px-3 py-1.5 rounded-full shadow-sm border border-indigo-100 self-center">
+                                        <a x-show="day.stayAddr" :href="getMapLink(day.stayAddr)" target="_blank" class="text-xs font-bold text-indigo-600 bg-white px-3 py-1.5 rounded-full shadow-sm border border-indigo-100 self-center ml-2 whitespace-nowrap">
                                             導航
                                         </a>
                                     </div>
@@ -609,11 +619,11 @@
                 
                 <div class="mt-4 space-y-2">
                     <div class="flex items-start text-xs text-teal-800 bg-white/50 p-2.5 rounded-lg">
-                        <i class="fa-solid fa-shirt mt-0.5 mr-2 text-teal-600"></i>
+                        <i class="fa-solid fa-shirt mt-0.5 mr-2 text-teal-600 flex-shrink-0"></i>
                         <span><strong>穿搭重點：</strong> 洋蔥式穿法是必須。南島(尤其米佛峽灣)需備防風防水外套與毛帽。</span>
                     </div>
                     <div class="flex items-start text-xs text-teal-800 bg-white/50 p-2.5 rounded-lg">
-                        <i class="fa-solid fa-shield-virus mt-0.5 mr-2 text-teal-600"></i>
+                        <i class="fa-solid fa-shield-virus mt-0.5 mr-2 text-teal-600 flex-shrink-0"></i>
                         <span><strong>防曬與防蟲：</strong> 紐西蘭紫外線極強，務必擦防曬。沙蠅(Sandfly)多，需備防蚊液。</span>
                     </div>
                 </div>
@@ -646,7 +656,7 @@
                 <div class="space-y-3">
                     <template x-for="item in ['Whittakers 巧克力 (超市掃貨)', 'Manuka 麥盧卡蜂蜜 (UMF認證)', 'Cookie Time 餅乾', 'Lanolin 綿羊油保養品', '羊駝被 / 羊毛製品']">
                         <div class="flex items-center text-sm text-gray-600 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                            <i class="fa-regular fa-square-check text-nzGreen mr-3"></i>
+                            <i class="fa-regular fa-square-check text-nzGreen mr-3 flex-shrink-0"></i>
                             <span x-text="item"></span>
                         </div>
                     </template>
@@ -660,15 +670,15 @@
                 </h3>
                 <ul class="text-sm text-gray-700 space-y-3 list-none">
                     <li class="flex items-start">
-                        <span class="bg-nzRed text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5">重要</span>
+                        <span class="bg-nzRed text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5 flex-shrink-0">重要</span>
                         <span>右駕靠左！雨刷跟方向燈相反，轉彎時心中默念「靠左靠左」。</span>
                     </li>
                     <li class="flex items-start">
-                        <span class="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5">規則</span>
+                        <span class="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5 flex-shrink-0">規則</span>
                         <span>圓環 (Roundabout) 必須禮讓右方來車。</span>
                     </li>
                     <li class="flex items-start">
-                        <span class="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5">路況</span>
+                        <span class="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5 flex-shrink-0">路況</span>
                         <span>單線橋樑 (One Lane Bridge) 需看箭頭指示優先權。</span>
                     </li>
                 </ul>
