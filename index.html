@@ -8,10 +8,7 @@
     <meta name="format-detection" content="telephone=no">
     <title>紐西蘭南北島・家族大旅行</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome -->
+    <!-- FontAwesome (Icons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -294,18 +291,17 @@
 
                 init() {
                     this.updateCurrentDay();
-                    // Optional: Auto-open today's card if trip is active
+                    if (isNaN(this.currentDayNum) || this.currentDayNum < 1) this.currentDayNum = 1;
                 },
 
                 updateCurrentDay() {
                     const startDate = new Date('2025-12-21');
                     const today = new Date();
-                    // Simple check to prevent errors if date is invalid
                     if (isNaN(today.getTime())) return;
                     
-                    const diffTime = Math.abs(today - startDate);
+                    const diffTime = today - startDate;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    this.currentDayNum = (today < startDate) ? 1 : diffDays;
+                    this.currentDayNum = diffDays;
                 },
 
                 toggleDay(index) {
@@ -324,7 +320,7 @@
                 
                 isPast(dateStr) {
                     const date = new Date(dateStr);
-                    const today = new Date('2025-12-22'); // Simulating start date
+                    const today = new Date('2025-12-22');
                     return date < today;
                 },
 
@@ -333,17 +329,18 @@
                 },
                 
                 getDotColor(type) {
-                    const colors = {
-                        transport: 'bg-gray-400 border-gray-400',
-                        food: 'bg-orange-400 border-orange-400',
-                        stay: 'bg-indigo-500 border-indigo-500',
-                        view: 'bg-nzGreen border-nzGreen',
-                        fun: 'bg-nzRed border-nzRed',
-                        shop: 'bg-purple-400 border-purple-400',
-                        star: 'bg-blue-800 border-blue-800',
-                        hike: 'bg-emerald-600 border-emerald-600'
+                    // Return just the class name suffix for our CSS
+                    const map = {
+                        transport: 'dot-gray',
+                        food: 'dot-orange',
+                        stay: 'dot-indigo',
+                        view: 'dot-green',
+                        fun: 'dot-red',
+                        shop: 'dot-purple',
+                        star: 'dot-blue',
+                        hike: 'dot-emerald'
                     };
-                    return colors[type] || 'bg-gray-400 border-gray-400';
+                    return map[type] || 'dot-gray';
                 }
             }));
         });
@@ -352,392 +349,558 @@
     <!-- Alpine.js -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        nzGreen: '#5D7E68',
-                        nzCream: '#F9F7F2',
-                        nzDark: '#2C3E50',
-                        nzBlue: '#6B8E9B',
-                        nzAccent: '#D4A373',
-                        nzRed: '#E76F51'
-                    },
-                    fontFamily: {
-                        sans: ['"Noto Sans TC"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'serif'],
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'float': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { 
-            background-color: #F9F7F2; 
-            -webkit-font-smoothing: antialiased; 
-            -webkit-text-size-adjust: 100%;
+        /* === RESET & VARIABLES === */
+        :root {
+            --primary: #5D7E68;
+            --secondary: #D4A373;
+            --bg: #F9F7F2;
+            --text-main: #2C3E50;
+            --text-light: #64748B;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
-        
-        /* Important for Alpine loading state - prevents FOUC */
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: calc(80px + var(--safe-bottom)); /* Space for nav */
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
         [x-cloak] { display: none !important; }
 
-        .ios-card {
-            background: rgba(255, 255, 255, 0.95);
-            /* Safari Support for Backdrop Filter */
-            -webkit-backdrop-filter: blur(10px); 
+        /* === TYPOGRAPHY === */
+        h1, h2, h3, h4 { margin: 0; font-weight: 700; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        
+        /* === LAYOUT UTILS === */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .flex-1 { flex: 1; }
+        .shrink-0 { flex-shrink: 0; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .hidden { display: none; }
+        .block { display: block; }
+        .w-full { width: 100%; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mr-2 { margin-right: 0.5rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .p-4 { padding: 1rem; }
+        .p-5 { padding: 1.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        
+        /* === COMPONENTS === */
+        
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(249, 247, 242, 0.95);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border-radius: 1.25rem;
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            z-index: 50;
+            padding-top: calc(10px + var(--safe-top));
+            padding-bottom: 10px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .subtitle { font-size: 10px; letter-spacing: 2px; color: var(--primary); text-transform: uppercase; font-weight: 700; }
+        .title { font-size: 24px; color: #333; }
+        .day-counter { font-size: 24px; color: var(--secondary); font-weight: 700; }
+
+        /* Main Container */
+        main {
+            margin-top: calc(90px + var(--safe-top));
+            padding: 0 16px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            position: sticky;
+            top: calc(75px + var(--safe-top));
+            z-index: 40;
+            background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+            padding: 10px 0;
+            margin: 0 -16px 16px -16px; /* Bleed to edges */
+            padding-left: 16px; /* Offset bleed */
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .tap-highlight-transparent { -webkit-tap-highlight-color: transparent; }
+        .tabs-container::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #999;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(93, 126, 104, 0.3);
+        }
+
+        /* Card Style */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
         
-        html { scroll-behavior: smooth; }
+        .card.expanded {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border-color: var(--primary);
+        }
+
+        .card.past {
+            opacity: 0.7;
+            filter: grayscale(0.5);
+        }
+
+        /* Date Badge */
+        .date-badge {
+            width: 50px;
+            height: 50px;
+            background: #f3f4f6;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .date-badge.active { background: var(--primary); color: #fff; }
+        .date-badge span:first-child { font-size: 10px; text-transform: uppercase; font-weight: 700; }
+        .date-badge span:last-child { font-size: 20px; font-weight: 700; line-height: 1; }
+
+        /* Flight Card Special */
+        .flight-card {
+            border-left: 6px solid var(--primary); /* Changed to primary green for consistency or blue */
+            border-left-color: #6B8E9B; /* NzBlue */
+        }
         
-        /* Desktop scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        .flight-line {
+            height: 2px;
+            background: #e5e7eb;
+            position: relative;
+            margin: 0 10px;
+            flex: 1;
+        }
+        .flight-line::before, .flight-line::after {
+            content: ''; position: absolute; top: -3px; width: 8px; height: 8px; border-radius: 50%;
+        }
+        .flight-line::before { left: 0; background: #ccc; }
+        .flight-line::after { right: 0; background: #6B8E9B; }
+        .plane-icon-center { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); color: #6B8E9B; font-size: 12px;}
+
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            padding-left: 16px;
+            margin-left: 8px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 24px;
+        }
         
         .timeline-line {
             position: absolute;
             left: 7px;
-            top: 10px;
-            bottom: -20px;
+            top: 15px;
+            bottom: -15px;
             width: 2px;
-            background-color: #E2E8F0;
+            background: #e5e7eb;
         }
-        .last-item .timeline-line { display: none; }
-        
-        /* iOS Safe Area Padding */
-        .safe-area-top { padding-top: env(safe-area-inset-top); }
-        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        .timeline-item:last-child .timeline-line { display: none; }
 
-        /* Ensure smooth scrolling on iOS for overflow containers */
-        .overflow-x-auto {
-            -webkit-overflow-scrolling: touch;
+        .timeline-dot {
+            position: absolute;
+            left: -2px;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 10;
         }
+
+        /* Dot Colors */
+        .dot-gray { background: #9ca3af; }
+        .dot-orange { background: #fb923c; }
+        .dot-indigo { background: #6366f1; }
+        .dot-green { background: #5D7E68; }
+        .dot-red { background: #ef4444; }
+        .dot-purple { background: #c084fc; }
+        .dot-blue { background: #1e40af; }
+        .dot-emerald { background: #059669; }
+
+        .activity-content {
+            padding-left: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        /* Map Button */
+        .map-btn {
+            width: 32px;
+            height: 32px;
+            background: #f9fafb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            text-decoration: none;
+            flex-shrink: 0;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+        .map-btn:active { background: var(--primary); color: #fff; }
+
+        /* Tip Box */
+        .tip-box {
+            display: inline-flex;
+            align-items: flex-start;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            font-size: 11px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: calc(20px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(44, 62, 80, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 10px 30px;
+            border-radius: 99px;
+            display: flex;
+            gap: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .nav-btn i { font-size: 18px; margin-bottom: 4px; }
+        .nav-btn.active { color: var(--secondary); }
+
+        /* Budget Table */
+        .budget-table { width: 100%; border-collapse: collapse; }
+        .budget-table th { text-align: left; padding: 12px 16px; background: #f9fafb; font-size: 12px; color: #6b7280; text-transform: uppercase; }
+        .budget-table td { padding: 14px 16px; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
+        .budget-table td:last-child { text-align: right; font-weight: 700; font-family: monospace; }
+        
+        /* Weather Grid */
+        .weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .weather-card { background: rgba(255,255,255,0.6); padding: 12px; border-radius: 16px; text-align: center; }
+
     </style>
 </head>
-<body class="text-nzDark pb-28 tap-highlight-transparent min-h-[100dvh] safe-area-bottom overflow-x-hidden" x-data="itineraryApp" x-cloak>
+<body x-data="itineraryApp" x-cloak>
 
     <!-- Header -->
-    <header class="fixed top-0 w-full z-50 bg-nzCream/95 backdrop-blur-md border-b border-gray-100 px-6 transition-all duration-300 shadow-sm safe-area-top pt-4 pb-3">
-        <div class="flex justify-between items-end max-w-2xl mx-auto pt-8"> <!-- Added manual pt-8 for non-notch phones fallback -->
+    <header>
+        <div class="header-content">
             <div>
-                <h2 class="text-[10px] font-bold tracking-[0.2em] text-nzGreen uppercase mb-1">New Zealand 2025-26</h2>
-                <h1 class="font-serif text-2xl font-bold text-gray-800">紐西蘭・夏日漫遊</h1>
+                <div class="subtitle">New Zealand 2025-26</div>
+                <h1 class="title font-serif">紐西蘭・夏日漫遊</h1>
             </div>
             <div class="text-right">
-                <span class="text-[10px] text-gray-400 block uppercase tracking-wide">Day</span>
-                <span class="text-2xl font-bold text-nzAccent font-serif" x-text="currentDayNum"></span>
+                <div style="font-size: 10px; color: #999; text-transform: uppercase;">Day</div>
+                <div class="day-counter font-serif" x-text="currentDayNum"></div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="mt-32 px-4 max-w-2xl mx-auto safe-area-top pt-8 overflow-x-hidden">
+    <main>
 
         <!-- Tab Navigation -->
-        <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1 sticky top-[90px] z-40 bg-gradient-to-b from-[#F9F7F2] via-[#F9F7F2] to-transparent pt-2 px-1 -mx-1 safe-area-top">
+        <div class="tabs-container">
             <template x-for="tab in tabs">
                 <button 
                     @click="activeTab = tab.id; window.scrollTo({top: 0, behavior: 'smooth'})"
-                    :class="activeTab === tab.id ? 'bg-nzGreen text-white shadow-md transform scale-105' : 'bg-white text-gray-500 hover:bg-gray-50'"
-                    class="px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-200 flex-shrink-0 border border-transparent shadow-sm"
+                    class="tab-btn"
+                    :class="activeTab === tab.id ? 'active' : ''"
                     x-text="tab.name">
                 </button>
             </template>
         </div>
 
         <!-- 1. ITINERARY VIEW -->
-        <div x-show="activeTab === 'itinerary'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="mt-4">
+        <div x-show="activeTab === 'itinerary'" x-transition.opacity>
             
             <!-- Flight Card -->
-            <div class="ios-card p-5 border-l-[6px] border-nzBlue relative overflow-hidden group mb-4">
-                <div class="absolute right-[-20px] top-[-20px] text-nzBlue/10 text-9xl transform rotate-12 group-hover:rotate-0 transition-transform duration-700 pointer-events-none">
-                    <i class="fa-solid fa-plane"></i>
+            <div class="card flight-card p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <span style="background:#6B8E9B; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">FLIGHT</span>
+                    <span style="font-size:12px; color:#999; font-family:monospace;">TRIP START</span>
                 </div>
-                <div class="flex justify-between items-start mb-4 relative z-10">
-                    <span class="bg-nzBlue text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm tracking-wide">FLIGHT</span>
-                    <span class="text-xs font-mono text-gray-400">NZ Trip Start</span>
-                </div>
-                <div class="space-y-4 relative z-10">
-                    <div class="flex justify-between items-center">
-                        <div class="text-center">
-                            <div class="text-3xl font-serif font-bold text-gray-800">TPE</div>
-                            <div class="text-xs text-gray-500 font-medium">台北</div>
-                        </div>
-                        <div class="flex-1 px-4 text-center">
-                            <div class="text-[10px] text-gray-400 mb-1">11h 40m</div>
-                            <div class="w-full h-[2px] bg-gray-200 relative">
-                                <div class="absolute w-2 h-2 bg-nzBlue rounded-full right-0 top-[-3px]"></div>
-                                <div class="absolute w-2 h-2 bg-gray-300 rounded-full left-0 top-[-3px]"></div>
-                                <i class="fa-solid fa-plane text-nzBlue absolute top-[-7px] left-1/2 transform -translate-x-1/2 text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-serif font-bold text-gray-800">AKL</div>
-                            <div class="text-xs text-gray-500 font-medium">奧克蘭</div>
-                        </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="text-center">
+                        <div style="font-size:24px; font-weight:700;">TPE</div>
+                        <div style="font-size:12px; color:#666;">台北</div>
                     </div>
                     
-                    <div class="bg-red-50 text-red-600 text-xs p-3 rounded-xl border border-red-100 flex items-start shadow-sm">
-                        <i class="fa-solid fa-triangle-exclamation mr-2 mt-0.5 text-sm"></i> 
-                        <div>
-                            <span class="font-bold block mb-0.5">轉機重要提醒</span>
-                            雖是聯程機票，但在奧克蘭必須<span class="font-bold underline">提領行李</span>並重新check-in國內線！
-                        </div>
+                    <div class="flight-line">
+                        <i class="fa-solid fa-plane plane-icon-center"></i>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div style="font-size:24px; font-weight:700;">AKL</div>
+                        <div style="font-size:12px; color:#666;">奧克蘭</div>
+                    </div>
+                </div>
+
+                <div class="tip-box" style="width:100%; border-color:#fecaca; background:#fef2f2; color:#b91c1c; margin-top:16px;">
+                    <i class="fa-solid fa-triangle-exclamation" style="margin-right:6px; margin-top:2px;"></i> 
+                    <div>
+                        <span style="font-weight:bold; display:block;">轉機重要提醒</span>
+                        在奧克蘭必須 <span style="text-decoration:underline;">提領行李</span> 並重新check-in國內線！
                     </div>
                 </div>
             </div>
 
-            <!-- Loop through Days -->
-            <!-- Removing space-y on container to fix Safari flux, using mb-4 on items -->
-            <div>
-                <template x-for="(day, index) in days" :key="index">
-                    <div class="ios-card overflow-hidden transition-all duration-300 mb-4" 
-                         :class="{'ring-2 ring-nzGreen/30 shadow-float': openDay === index, 'opacity-75 grayscale-[0.3]': isPast(day.date) && openDay !== index}">
-                        
-                        <!-- Card Header -->
-                        <div @click="toggleDay(index)" class="p-5 flex justify-between items-center cursor-pointer active:bg-gray-50 transition-colors">
-                            <div class="flex items-center space-x-4 min-w-0"> <!-- Safari Fix: min-w-0 -->
-                                <div class="flex flex-col items-center justify-center bg-gray-100 w-14 h-14 rounded-2xl text-center shadow-inner flex-shrink-0" :class="{'bg-nzGreen text-white shadow-none': openDay === index}">
-                                    <span class="text-[10px] uppercase font-bold tracking-wider" x-text="formatMonth(day.date)"></span>
-                                    <span class="text-xl font-bold leading-none font-serif" x-text="formatDate(day.date)"></span>
-                                </div>
-                                <div class="min-w-0"> <!-- Safari Fix: min-w-0 -->
-                                    <h3 class="font-bold text-gray-800 text-lg truncate" x-text="day.title"></h3>
-                                    <p class="text-xs text-gray-500 mt-1 font-medium flex items-center truncate">
-                                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-nzAccent mr-1.5 flex-shrink-0"></span>
-                                        <span class="truncate" x-text="day.route"></span>
-                                    </p>
-                                </div>
+            <!-- Days List -->
+            <template x-for="(day, index) in days" :key="index">
+                <div class="card" :class="{'expanded': openDay === index, 'past': isPast(day.date) && openDay !== index}">
+                    
+                    <!-- Card Header -->
+                    <div @click="toggleDay(index)" class="p-5 flex items-center justify-between" style="cursor: pointer;">
+                        <div class="flex items-center" style="gap: 16px;">
+                            <div class="date-badge" :class="{'active': openDay === index}">
+                                <span x-text="formatMonth(day.date)"></span>
+                                <span x-text="formatDate(day.date)"></span>
                             </div>
-                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition-transform duration-300 flex-shrink-0 ml-2" :class="{'rotate-180 bg-green-50 text-nzGreen': openDay === index}">
-                                <i class="fa-solid fa-chevron-down text-xs text-gray-400" :class="{'text-nzGreen': openDay === index}"></i>
+                            <div style="min-width: 0; flex: 1;"> <!-- Fix for text overflow -->
+                                <h3 style="font-size:16px; margin-bottom:4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="day.title"></h3>
+                                <div style="font-size:12px; color:#666; display:flex; items-align:center;">
+                                    <span style="width:6px; height:6px; background:var(--secondary); border-radius:50%; margin-right:6px; margin-top:5px;"></span>
+                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="day.route"></span>
+                                </div>
                             </div>
                         </div>
+                        <i class="fa-solid fa-chevron-down" style="color:#ccc; transition:0.3s;" :style="openDay === index ? 'transform:rotate(180deg); color:var(--primary)' : ''"></i>
+                    </div>
 
-                        <!-- Card Body (Expandable) -->
-                        <div x-show="openDay === index" x-collapse class="bg-white border-t border-gray-100">
-                            <!-- Transport Info Bar -->
-                            <div class="px-5 py-3 bg-gray-50/80 flex items-center space-x-6 text-xs font-medium text-gray-600 border-b border-gray-100" x-show="day.driveTime !== '-'">
-                                <span class="flex items-center"><i class="fa-solid fa-road mr-2 text-gray-400"></i> <span x-text="day.km"></span></span>
-                                <span class="flex items-center"><i class="fa-regular fa-clock mr-2 text-gray-400"></i> <span x-text="day.driveTime"></span></span>
+                    <!-- Card Body -->
+                    <div x-show="openDay === index" x-collapse style="border-top:1px solid #f3f4f6;">
+                        <!-- Transport Info -->
+                        <div class="px-4 py-2" style="background:#f9fafb; display:flex; gap:20px; font-size:12px; color:#666; font-weight:500;">
+                            <span x-show="day.km !== '-'"><i class="fa-solid fa-road mr-2"></i> <span x-text="day.km"></span></span>
+                            <span x-show="day.driveTime !== '-'"><i class="fa-regular fa-clock mr-2"></i> <span x-text="day.driveTime"></span></span>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="p-5">
+                            <div class="timeline-container">
+                                <template x-for="(item, idx) in day.activities">
+                                    <div class="timeline-item">
+                                        <div class="timeline-line"></div>
+                                        <div class="timeline-dot" :class="getDotColor(item.type)"></div>
+                                        
+                                        <div class="activity-content">
+                                            <div style="flex:1; min-width:0;">
+                                                <div style="font-weight:700; font-size:14px; margin-bottom:4px;" x-text="item.name"></div>
+                                                <div style="font-size:12px; color:#666; line-height:1.5;" x-text="item.desc"></div>
+                                                
+                                                <div x-show="item.tip" class="tip-box">
+                                                    <i class="fa-solid fa-lightbulb" style="margin-right:6px; color:#f59e0b;"></i>
+                                                    <span x-text="item.tip"></span>
+                                                </div>
+                                            </div>
+                                            <a :href="getMapLink(item.name)" target="_blank" class="map-btn">
+                                                <i class="fa-solid fa-location-arrow" style="font-size:12px;"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
 
-                            <!-- Timeline Activities -->
-                            <div class="p-5 pb-2">
-                                <div class="ml-2 pl-4 relative">
-                                    <template x-for="(item, idx) in day.activities">
-                                        <div class="relative mb-6" :class="{'last-item': idx === day.activities.length - 1}">
-                                            <!-- Vertical Line -->
-                                            <div class="timeline-line"></div>
-                                            
-                                            <!-- Dot -->
-                                            <div class="absolute -left-[23px] top-1 w-4 h-4 rounded-full border-[3px] border-white shadow-sm z-10" 
-                                                 :class="getDotColor(item.type)">
-                                            </div>
-
-                                            <div class="flex justify-between items-start group">
-                                                <div class="pr-2 min-w-0 flex-1"> <!-- Safari Fix: min-w-0 -->
-                                                    <h4 class="font-bold text-sm text-gray-800 leading-tight break-words" x-text="item.name"></h4>
-                                                    <p class="text-xs text-gray-500 mt-1.5 leading-relaxed break-words" x-text="item.desc"></p>
-                                                    
-                                                    <!-- AI Tip Tag -->
-                                                    <div x-show="item.tip" class="mt-2.5 inline-flex items-start bg-amber-50 text-amber-800 text-[10px] px-2.5 py-1.5 rounded-lg border border-amber-100 max-w-full">
-                                                        <i class="fa-solid fa-lightbulb mr-1.5 mt-0.5 text-amber-500 flex-shrink-0"></i> 
-                                                        <span class="font-medium break-words" x-text="item.tip"></span>
-                                                    </div>
-                                                </div>
-                                                
-                                                <!-- Map Button -->
-                                                <a :href="getMapLink(item.name)" target="_blank" class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-nzGreen hover:text-white transition-all shadow-sm active:scale-95 ml-2">
-                                                    <i class="fa-solid fa-location-arrow text-xs"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-
-                                <!-- Accommodation Block -->
-                                <div class="mt-6 mb-2 pt-4 border-t border-gray-100" x-show="day.stay && day.stay !== '-'">
-                                    <div class="flex items-start bg-indigo-50/50 p-3 rounded-xl border border-indigo-50">
-                                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500 mr-3 flex-shrink-0">
-                                            <i class="fa-solid fa-bed text-xs"></i>
-                                        </div>
-                                        <div class="flex-1 min-w-0"> <!-- Safari Fix: min-w-0 -->
-                                            <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-wide mb-0.5">Tonight's Stay</div>
-                                            <div class="text-sm font-bold text-gray-800 truncate" x-text="day.stay"></div>
-                                            <div class="text-xs text-gray-500 mt-0.5 truncate" x-text="day.stayAddr"></div>
-                                        </div>
-                                        <a x-show="day.stayAddr" :href="getMapLink(day.stayAddr)" target="_blank" class="text-xs font-bold text-indigo-600 bg-white px-3 py-1.5 rounded-full shadow-sm border border-indigo-100 self-center ml-2 whitespace-nowrap">
-                                            導航
-                                        </a>
+                            <!-- Stay Info -->
+                            <div x-show="day.stay && day.stay !== '-'" style="margin-top:10px; padding-top:16px; border-top:1px solid #f3f4f6;">
+                                <div style="display:flex; background:#eef2ff; border-radius:12px; padding:12px; border:1px solid #e0e7ff;">
+                                    <div style="width:32px; height:32px; background:#e0e7ff; color:#6366f1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:12px;">
+                                        <i class="fa-solid fa-bed" style="font-size:12px;"></i>
+                                    </div>
+                                    <div style="flex:1;">
+                                        <div style="font-size:10px; font-weight:700; color:#818cf8; text-transform:uppercase;">Tonight's Stay</div>
+                                        <div style="font-size:14px; font-weight:700; color:#333;" x-text="day.stay"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </template>
-            </div>
-            
-            <div class="h-8"></div>
+                </div>
+            </template>
+            <div style="height: 40px;"></div>
         </div>
 
         <!-- 2. GUIDE VIEW -->
-        <div x-show="activeTab === 'guide'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="mt-4 pb-20">
-            
-            <!-- Weather Widget -->
-            <div class="ios-card p-6 rounded-3xl bg-gradient-to-br from-[#E0F2F1] to-white border-none shadow-soft mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-serif font-bold text-lg text-teal-900">12月-1月 天氣指南</h3>
-                    <span class="bg-white/80 px-2 py-1 rounded text-[10px] font-bold text-teal-700">夏季</span>
-                </div>
-                
-                <div class="flex justify-between gap-4">
-                    <div class="flex-1 text-center bg-white/60 p-3 rounded-2xl">
-                        <i class="fa-solid fa-wind text-2xl text-blue-300 mb-2"></i>
-                        <div class="text-xs font-bold text-gray-600 mb-1">南島</div>
-                        <div class="text-lg font-bold text-gray-800">10-22°C</div>
-                        <div class="text-[10px] text-gray-400 mt-1">早晚溫差大</div>
+        <div x-show="activeTab === 'guide'" x-transition.opacity>
+            <div class="card p-5" style="background: linear-gradient(135deg, #e0f2f1 0%, #ffffff 100%); border:none;">
+                <h3 class="font-serif" style="margin-bottom:16px; color:#134e4a;">12月-1月 天氣指南</h3>
+                <div class="weather-grid">
+                    <div class="weather-card">
+                        <i class="fa-solid fa-wind" style="font-size:20px; color:#93c5fd; margin-bottom:8px;"></i>
+                        <div style="font-size:12px; font-weight:700; color:#666;">南島</div>
+                        <div style="font-size:16px; font-weight:700;">10-22°C</div>
                     </div>
-                    <div class="flex-1 text-center bg-white/60 p-3 rounded-2xl">
-                        <i class="fa-solid fa-sun text-2xl text-orange-400 mb-2"></i>
-                        <div class="text-xs font-bold text-gray-600 mb-1">北島</div>
-                        <div class="text-lg font-bold text-gray-800">14-25°C</div>
-                        <div class="text-[10px] text-gray-400 mt-1">陽光強烈</div>
+                    <div class="weather-card">
+                        <i class="fa-solid fa-sun" style="font-size:20px; color:#fbbf24; margin-bottom:8px;"></i>
+                        <div style="font-size:12px; font-weight:700; color:#666;">北島</div>
+                        <div style="font-size:16px; font-weight:700;">14-25°C</div>
                     </div>
                 </div>
-                
-                <div class="mt-4 space-y-2">
-                    <div class="flex items-start text-xs text-teal-800 bg-white/50 p-2.5 rounded-lg">
-                        <i class="fa-solid fa-shirt mt-0.5 mr-2 text-teal-600 flex-shrink-0"></i>
-                        <span><strong>穿搭重點：</strong> 洋蔥式穿法是必須。南島(尤其米佛峽灣)需備防風防水外套與毛帽。</span>
-                    </div>
-                    <div class="flex items-start text-xs text-teal-800 bg-white/50 p-2.5 rounded-lg">
-                        <i class="fa-solid fa-shield-virus mt-0.5 mr-2 text-teal-600 flex-shrink-0"></i>
-                        <span><strong>防曬與防蟲：</strong> 紐西蘭紫外線極強，務必擦防曬。沙蠅(Sandfly)多，需備防蚊液。</span>
-                    </div>
+                <div class="tip-box" style="background:rgba(255,255,255,0.6); border:none; margin-top:12px; width:100%;">
+                    <i class="fa-solid fa-shirt" style="margin-right:8px; color:#0f766e;"></i>
+                    <span><strong>穿搭重點：</strong> 洋蔥式穿法。南島(尤其米佛峽灣)需備防風防水外套。</span>
                 </div>
             </div>
 
-            <!-- Essential Cards -->
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="ios-card p-4 flex flex-col items-center justify-center text-center bg-white">
-                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 mb-2">
-                        <i class="fa-solid fa-passport"></i>
-                    </div>
-                    <h4 class="font-bold text-sm text-gray-800">NZeTA 簽證</h4>
-                    <p class="text-[10px] text-gray-400 mt-1">需事前申請核准<br>含IVL旅遊稅</p>
+            <div class="grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">
+                <div class="card p-4 text-center">
+                    <i class="fa-solid fa-passport" style="font-size:24px; color:#c084fc; margin-bottom:8px;"></i>
+                    <div style="font-size:14px; font-weight:700;">NZeTA</div>
+                    <div style="font-size:10px; color:#999;">需事前申請</div>
                 </div>
-                <div class="ios-card p-4 flex flex-col items-center justify-center text-center bg-white">
-                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-500 mb-2">
-                        <i class="fa-solid fa-wifi"></i>
-                    </div>
-                    <h4 class="font-bold text-sm text-gray-800">網路通訊</h4>
-                    <p class="text-[10px] text-gray-400 mt-1">山區訊號差<br>下載離線地圖</p>
+                <div class="card p-4 text-center">
+                    <i class="fa-solid fa-wifi" style="font-size:24px; color:#4ade80; margin-bottom:8px;"></i>
+                    <div style="font-size:14px; font-weight:700;">網卡</div>
+                    <div style="font-size:10px; color:#999;">山區下載離線地圖</div>
                 </div>
             </div>
 
-            <!-- Souvenir List -->
-            <div class="ios-card p-6 mb-6">
-                <h3 class="font-serif font-bold text-lg mb-4 flex items-center text-gray-800">
-                    <span class="w-8 h-8 rounded-full bg-nzAccent/20 flex items-center justify-center text-nzAccent mr-2 text-sm"><i class="fa-solid fa-gift"></i></span>
-                    必買伴手禮
-                </h3>
-                <div class="space-y-3">
-                    <template x-for="item in ['Whittakers 巧克力 (超市掃貨)', 'Manuka 麥盧卡蜂蜜 (UMF認證)', 'Cookie Time 餅乾', 'Lanolin 綿羊油保養品', '羊駝被 / 羊毛製品']">
-                        <div class="flex items-center text-sm text-gray-600 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                            <i class="fa-regular fa-square-check text-nzGreen mr-3 flex-shrink-0"></i>
-                            <span x-text="item"></span>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <!-- Driving Rules -->
-            <div class="ios-card p-5 border-l-4 border-nzRed bg-red-50/30">
-                <h3 class="font-bold text-nzRed mb-3 flex items-center">
-                    <i class="fa-solid fa-car-side mr-2"></i> 自駕生死守則
-                </h3>
-                <ul class="text-sm text-gray-700 space-y-3 list-none">
-                    <li class="flex items-start">
-                        <span class="bg-nzRed text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5 flex-shrink-0">重要</span>
-                        <span>右駕靠左！雨刷跟方向燈相反，轉彎時心中默念「靠左靠左」。</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5 flex-shrink-0">規則</span>
-                        <span>圓環 (Roundabout) 必須禮讓右方來車。</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5 flex-shrink-0">路況</span>
-                        <span>單線橋樑 (One Lane Bridge) 需看箭頭指示優先權。</span>
-                    </li>
+            <div class="card p-5" style="border-left:4px solid #ef4444; background:#fef2f2;">
+                <h3 style="color:#b91c1c; font-size:16px; margin-bottom:12px;"><i class="fa-solid fa-car-side mr-2"></i> 自駕生死守則</h3>
+                <ul style="padding-left:20px; font-size:14px; color:#7f1d1d; line-height:1.6;">
+                    <li><strong>右駕靠左！</strong>雨刷方向燈相反。</li>
+                    <li>圓環 (Roundabout) 禮讓右方來車。</li>
+                    <li>單線橋樑看箭頭優先權。</li>
                 </ul>
             </div>
+            <div style="height: 40px;"></div>
         </div>
 
         <!-- 3. BUDGET VIEW -->
-        <div x-show="activeTab === 'budget'" x-transition:enter="transition ease-out duration-300" class="mt-4">
-            <div class="ios-card overflow-hidden">
-                <div class="bg-nzDark p-6 text-white relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full"></div>
-                    <div class="absolute -left-4 -bottom-4 w-16 h-16 bg-white/10 rounded-full"></div>
-                    <h3 class="font-serif font-bold text-lg relative z-10">預訂門票估算</h3>
-                    <p class="text-white/60 text-xs mt-1 relative z-10">每人預估費用 (TWD)</p>
-                    <div class="mt-4 text-3xl font-bold relative z-10">$12,454</div>
+        <div x-show="activeTab === 'budget'" x-transition.opacity>
+            <div class="card" style="overflow:hidden;">
+                <div style="background:#2C3E50; color:white; padding:24px; position:relative;">
+                    <h3 class="font-serif">預訂門票估算</h3>
+                    <div style="font-size:32px; font-weight:700; margin-top:8px;">$12,454</div>
+                    <div style="font-size:12px; opacity:0.7;">每人預估費用 (TWD)</div>
                 </div>
-                
-                <div class="p-0">
-                    <div class="max-h-[60vh] overflow-y-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="text-xs text-gray-400 uppercase bg-gray-50 sticky top-0 z-20">
-                                <tr>
-                                    <th class="px-5 py-3 font-medium bg-gray-50">項目</th>
-                                    <th class="px-5 py-3 text-right font-medium bg-gray-50">金額</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                <template x-for="item in budgetItems">
-                                    <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="px-5 py-3.5 text-gray-700 font-medium" x-text="item.name"></td>
-                                        <td class="px-5 py-3.5 text-right font-bold text-gray-900" x-text="item.cost"></td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-5 py-3 text-[10px] text-gray-400 text-center border-t border-gray-100">
-                    * 匯率浮動，實際刷卡金額以當日銀行為準
+                <table class="budget-table">
+                    <tbody>
+                        <template x-for="item in budgetItems">
+                            <tr>
+                                <td x-text="item.name" style="color:#4b5563;"></td>
+                                <td x-text="item.cost"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <div style="background:#f9fafb; padding:10px; text-align:center; font-size:10px; color:#9ca3af;">
+                    * 實際金額以當日匯率為準
                 </div>
             </div>
+            <div style="height: 40px;"></div>
         </div>
 
     </main>
 
-    <!-- Bottom Navigation (Floating) -->
-    <nav class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-nzDark/90 text-white rounded-full px-8 py-3.5 shadow-float flex space-x-10 z-50 backdrop-blur-xl border border-white/10 safe-area-bottom">
-        <button @click="activeTab = 'itinerary'" :class="activeTab === 'itinerary' ? 'text-nzAccent' : 'text-gray-400'" class="flex flex-col items-center transition-all duration-300 hover:text-white">
-            <i class="fa-solid fa-map text-lg mb-1"></i>
-            <span class="text-[9px] font-bold">行程</span>
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <button @click="activeTab = 'itinerary'; window.scrollTo({top: 0, behavior: 'smooth'})" 
+                class="nav-btn" :class="activeTab === 'itinerary' ? 'active' : ''">
+            <i class="fa-solid fa-map"></i> 行程
         </button>
-        <button @click="activeTab = 'guide'" :class="activeTab === 'guide' ? 'text-nzAccent' : 'text-gray-400'" class="flex flex-col items-center transition-all duration-300 hover:text-white">
-            <i class="fa-solid fa-compass text-lg mb-1"></i>
-            <span class="text-[9px] font-bold">攻略</span>
+        <button @click="activeTab = 'guide'; window.scrollTo({top: 0, behavior: 'smooth'})" 
+                class="nav-btn" :class="activeTab === 'guide' ? 'active' : ''">
+            <i class="fa-solid fa-compass"></i> 攻略
         </button>
-        <button @click="activeTab = 'budget'" :class="activeTab === 'budget' ? 'text-nzAccent' : 'text-gray-400'" class="flex flex-col items-center transition-all duration-300 hover:text-white">
-            <i class="fa-solid fa-receipt text-lg mb-1"></i>
-            <span class="text-[9px] font-bold">預算</span>
+        <button @click="activeTab = 'budget'; window.scrollTo({top: 0, behavior: 'smooth'})" 
+                class="nav-btn" :class="activeTab === 'budget' ? 'active' : ''">
+            <i class="fa-solid fa-receipt"></i> 預算
         </button>
     </nav>
+
 </body>
 </html>
