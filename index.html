@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>紐西蘭南北島・家族大旅行</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <!-- App Logic (Loaded before Alpine) -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('itineraryApp', () => ({
+                activeTab: 'itinerary',
+                openDay: 0, 
+                currentDayNum: 1,
+                
+                budgetItems: [
+                    {name: '米佛峽灣遊船', cost: '570'},
+                    {name: 'RealNZ 螢火蟲洞', cost: '2,360'},
+                    {name: '企鵝歸巢', cost: '735'},
+                    {name: 'Heritage 農場', cost: '855'},
+                    {name: '終極樹冠之旅', cost: '4,613'},
+                    {name: '空中纜車+滑板車', cost: '1,629'},
+                    {name: 'ZORB 水球', cost: '1,692'}
+                ],
+
+                tabs: [
+                    {id: 'itinerary', name: '每日行程'},
+                    {id: 'guide', name: '旅遊攻略'},
+                    {id: 'budget', name: '票券預算'}
+                ],
+
+                days: [
+                    {
+                        date: '2025-12-22',
+                        title: '抵達基督城',
+                        route: 'AKL -> CHC',
+                        km: '3km',
+                        driveTime: '10m',
+                        stay: 'Christchurch 住宿',
+                        stayAddr: 'Christchurch, New Zealand', 
+                        activities: [
+                            {name: '抵達奧克蘭機場 (AKL)', desc: '12:00 抵達。務必提領行李，轉國內線。', type: 'transport', tip: '轉機時間緊湊(1h50m)，請快步移動。'},
+                            {name: '飛往基督城 (CHC)', desc: '13:25 抵達。取租車。', type: 'transport'},
+                            {name: '超市採買', desc: 'Pack\'n Save 或 Countdown 買水與早餐。', type: 'food'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-23',
+                        title: '前進藍色牛奶湖',
+                        route: '基督城 -> 特威澤爾',
+                        km: '280km',
+                        driveTime: '3h',
+                        stay: 'Twizel 住宿',
+                        stayAddr: 'Twizel, New Zealand',
+                        activities: [
+                            {name: 'Lake Tekapo 蒂卡波湖', desc: '魯冰花盛開季，絕美湖景。', type: 'view', tip: '湖邊風大，記得戴帽子。'},
+                            {name: '好牧羊人教堂', desc: '經典地標。', type: 'view'},
+                            {name: 'Lake Pukaki', desc: '著名的藍色牛奶湖，可遠眺庫克山。', type: 'view', tip: '必吃路邊 Mt Cook Alpine Salmon 生魚片！'},
+                            {name: '暗空保護區觀星', desc: '若天氣好，抬頭即見銀河。', type: 'star'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-24',
+                        title: '平安夜玩瓦納卡',
+                        route: '特威澤爾 -> 瓦納卡',
+                        km: '120km',
+                        driveTime: '2h',
+                        stay: 'Wanaka 住宿',
+                        stayAddr: 'Wanaka, New Zealand',
+                        activities: [
+                            {name: 'Wanaka Lavender Farm', desc: '紫色夢幻花海，吃薰衣草冰淇淋。', type: 'view'},
+                            {name: 'Puzzling World', desc: '錯視藝術迷宮。', type: 'fun', tip: '12/25 沒開，今天先玩！'},
+                            {name: '瓦納卡孤獨樹', desc: '湖中孤樹，黃昏最美。', type: 'view'},
+                            {name: '平安夜大餐', desc: '餐廳需預訂，或超市買牛排回民宿煮。', type: 'food'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-25',
+                        title: '聖誕節慢活',
+                        route: '瓦納卡一日遊',
+                        km: '-',
+                        driveTime: '-',
+                        stay: 'Wanaka 住宿',
+                        stayAddr: 'Wanaka, New Zealand',
+                        activities: [
+                            {name: 'Mount Iron Track', desc: '健行約2小時，俯瞰全景。', type: 'hike'},
+                            {name: 'Rippon Vineyard', desc: '世界最美酒莊之一，免費品酒。', type: 'view', tip: '留意聖誕節營業時間，通常下午5點關。'},
+                            {name: '湖畔野餐', desc: '享受悠閒聖誕午後。', type: 'food'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-26',
+                        title: '水果之鄉與螢火蟲',
+                        route: '瓦納卡 -> 蒂阿瑙',
+                        km: '230km',
+                        driveTime: '3h',
+                        stay: 'Te Anau 住宿',
+                        stayAddr: 'Te Anau, New Zealand',
+                        activities: [
+                            {name: 'Cromwell 水果鎮', desc: 'Jones Family Fruit Stall 買櫻桃、水蜜桃。', type: 'food'},
+                            {name: 'RealNZ 螢火蟲洞', desc: '搭船入洞看藍光星河。', type: 'view', tip: '洞內不能拍照，用心欣賞。'},
+                            {name: 'Te Anau 湖畔', desc: '南島第一大湖。', type: 'view'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-27',
+                        title: '世界遺產米佛峽灣',
+                        route: '蒂阿瑙 -> 米佛 -> 但尼丁',
+                        km: '430km',
+                        driveTime: '9h(含遊)',
+                        stay: 'Dunedin 住宿',
+                        stayAddr: 'Dunedin, New Zealand',
+                        activities: [
+                            {name: '前往米佛峽灣', desc: '07:30 出發。經鏡湖、Eglinton Valley。', type: 'transport', tip: '容易暈車者請先吃藥。'},
+                            {name: '峽灣遊船', desc: '11:00 船班。看瀑布、海豹。', type: 'view', tip: '甲板風極大，需穿防風防水外套。'},
+                            {name: '長途拉車至但尼丁', desc: '經 Lumsden 休息。', type: 'transport'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-28',
+                        title: '蘇格蘭風情古都',
+                        route: '但尼丁 -> 奧瑪魯',
+                        km: '120km',
+                        driveTime: '1.5h',
+                        stay: 'Oamaru 住宿',
+                        stayAddr: 'Oamaru, New Zealand',
+                        activities: [
+                            {name: '但尼丁火車站', desc: '華麗復古建築。', type: 'view'},
+                            {name: '鮑德溫街 (Baldwin St)', desc: '世界最陡街道。', type: 'fun'},
+                            {name: '奧瑪魯維多利亞老街', desc: '蒸汽龐克風格。', type: 'view'},
+                            {name: '藍企鵝歸巢', desc: '約 20:45 開始。', type: 'view', tip: '海邊晚上極冷，禁止拍照。'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-29',
+                        title: '東海岸返回',
+                        route: '奧瑪魯 -> 基督城',
+                        km: '250km',
+                        driveTime: '3h',
+                        stay: 'Christchurch 住宿',
+                        stayAddr: 'Christchurch, New Zealand',
+                        activities: [
+                            {name: 'Caroline Bay', desc: '蒂瑪魯海灘，可能有海豹。', type: 'view'},
+                            {name: '抵達基督城還車', desc: '算好時間還車。', type: 'transport'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-30',
+                        title: '花園城市漫遊',
+                        route: '基督城自由行',
+                        km: '-',
+                        driveTime: '-',
+                        stay: 'Christchurch 住宿',
+                        stayAddr: 'Christchurch, New Zealand',
+                        activities: [
+                            {name: '植物園 & 雅芳河', desc: '英式撐船體驗。', type: 'view'},
+                            {name: '紙板教堂', desc: '地震後重建地標。', type: 'view'},
+                            {name: 'Riverside Market', desc: '美食市集晚餐。', type: 'food'}
+                        ]
+                    },
+                    {
+                        date: '2025-12-31',
+                        title: '紐西蘭跨年！',
+                        route: '基督城',
+                        km: '-',
+                        driveTime: '-',
+                        stay: 'Christchurch 住宿',
+                        stayAddr: 'Christchurch, New Zealand',
+                        activities: [
+                            {name: 'North Hagley Park', desc: '跨年音樂會。', type: 'fun', tip: '帶野餐墊與保暖衣物。'},
+                            {name: '3...2...1 Happy New Year!', desc: '全球最早跨年國家之一。', type: 'fun'}
+                        ]
+                    },
+                    {
+                        date: '2026-01-01',
+                        title: '飛向北島火山',
+                        route: 'CHC -> Ohakune',
+                        km: '320km',
+                        driveTime: '4.5h',
+                        stay: 'Ohakune 住宿',
+                        stayAddr: 'Ohakune, New Zealand',
+                        activities: [
+                            {name: '飛往威靈頓 (WLG)', desc: '12:15 起飛，13:30 抵達。', type: 'transport'},
+                            {name: '租車北上', desc: '前往國家公園區。', type: 'transport'}
+                        ]
+                    },
+                    {
+                        date: '2026-01-02',
+                        title: '火山與陶波湖',
+                        route: 'Ohakune -> 陶波',
+                        km: '150km',
+                        driveTime: '2h',
+                        stay: '10 Wiremu Street, Turangi',
+                        stayAddr: '10 Wiremu Street, Turangi',
+                        activities: [
+                            {name: 'Whakapapa Village', desc: '眺望 Ruapehu 火山。', type: 'view'},
+                            {name: 'Taranaki Falls', desc: '步道健行看瀑布。', type: 'hike'},
+                            {name: '陶波麥當勞', desc: '在飛機裡吃漢堡。', type: 'food'},
+                            {name: 'Huka Prawn Park', desc: '釣蝦吃蝦親子樂。', type: 'fun'}
+                        ]
+                    },
+                    {
+                        date: '2026-01-03',
+                        title: '森林樹冠層探險',
+                        route: '陶波 -> 羅托魯瓦',
+                        km: '80km',
+                        driveTime: '1h',
+                        stay: 'Rotorua 住宿',
+                        stayAddr: 'Rotorua, New Zealand',
+                        activities: [
+                            {name: 'Canopy Tours', desc: '3小時樹冠層滑索，刺激！', type: 'fun'},
+                            {name: 'Redwoods Treewalk', desc: '夜間紅木森林吊橋，如阿凡達場景。', type: 'view'}
+                        ]
+                    },
+                    {
+                        date: '2026-01-04',
+                        title: '農場與纜車',
+                        route: '羅托魯瓦',
+                        km: '-',
+                        driveTime: '-',
+                        stay: 'Rotorua 住宿',
+                        stayAddr: 'Rotorua, New Zealand',
+                        activities: [
+                            {name: 'Agrodome Heritage 農場', desc: '摸羊駝、看剪羊毛秀。', type: 'fun'},
+                            {name: 'Skyline Rotorua', desc: '纜車+Luge滑板車(5圈)。', type: 'fun', tip: '滑板車超好玩，必玩！'}
+                        ]
+                    },
+                    {
+                        date: '2026-01-05',
+                        title: '地熱奇觀與滾球',
+                        route: '羅托魯瓦',
+                        km: '-',
+                        driveTime: '-',
+                        stay: '4 Westbourne Ave, Rotorua',
+                        stayAddr: '4 Westbourne Avenue, Rotorua',
+                        activities: [
+                            {name: 'Lady Knox Geyser', desc: '10:15 準時噴發。', type: 'view'},
+                            {name: 'Wai-O-Tapu', desc: '彩色香檳池地熱。', type: 'view', tip: '硫磺味重，但景色特別。'},
+                            {name: 'ZORB 水球', desc: '人進球裡滾下山坡。', type: 'fun', tip: '記得帶泳衣毛巾。'}
+                        ]
+                    },
+                    {
+                        date: '2026-01-06',
+                        title: '前往奧克蘭',
+                        route: '羅托魯瓦 -> 奧克蘭',
+                        km: '230km',
+                        driveTime: '3h',
+                        stay: '64 Federal St, Auckland',
+                        stayAddr: '64 Federal Street, Auckland',
+                        activities: [
+                            {name: '開車北上', desc: '前往奧克蘭。', type: 'transport'},
+                            {name: '還車 & 入住', desc: '14:30 前還車。', type: 'transport'},
+                            {name: 'Federal St 晚餐', desc: '市區享用美食。', type: 'food'}
+                        ]
+                    },
+                    {
+                        date: '2026-01-07',
+                        title: '千帆之都',
+                        route: '奧克蘭',
+                        km: '-',
+                        driveTime: '-',
+                        stay: '64 Federal St, Auckland',
+                        stayAddr: '64 Federal Street, Auckland',
+                        activities: [
+                            {name: 'Queen Street', desc: '最後購物衝刺。', type: 'shop'},
+                            {name: 'Sky Tower', desc: '南半球最高塔。', type: 'view'},
+                            {name: 'Britomart', desc: '海港區散步。', type: 'view'}
+                        ]
+                    },
+                    {
+                        date: '2026-01-08',
+                        title: '再見紐西蘭',
+                        route: 'AKL -> TPE',
+                        km: '-',
+                        driveTime: '-',
+                        stay: '-',
+                        activities: [
+                            {name: '前往機場', desc: '搭機返台。', type: 'transport'},
+                            {name: 'Sweet Home', desc: '10:45 起飛。', type: 'transport'}
+                        ]
+                    }
+                ],
+
+                init() {
+                    this.updateCurrentDay();
+                    // Optional: Auto-open today's card if trip is active
+                },
+
+                updateCurrentDay() {
+                    // Logic to set day number based on start date (Dec 21)
+                    const startDate = new Date('2025-12-21');
+                    const today = new Date();
+                    const diffTime = Math.abs(today - startDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    // If before trip, show 1. If during trip, show day num.
+                    this.currentDayNum = (today < startDate) ? 1 : diffDays;
+                },
+
+                toggleDay(index) {
+                    this.openDay = (this.openDay === index) ? -1 : index;
+                },
+
+                formatDate(dateStr) {
+                    const date = new Date(dateStr);
+                    return date.getDate();
+                },
+                
+                formatMonth(dateStr) {
+                    const date = new Date(dateStr);
+                    return date.toLocaleString('default', { month: 'short' });
+                },
+                
+                isPast(dateStr) {
+                    const date = new Date(dateStr);
+                    const today = new Date('2025-12-22'); // Simulating start date
+                    return date < today;
+                },
+
+                getMapLink(query) {
+                    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query + ' New Zealand')}`;
+                },
+                
+                getDotColor(type) {
+                    const colors = {
+                        transport: 'bg-gray-400 border-gray-400',
+                        food: 'bg-orange-400 border-orange-400',
+                        stay: 'bg-indigo-500 border-indigo-500',
+                        view: 'bg-nzGreen border-nzGreen',
+                        fun: 'bg-nzRed border-nzRed',
+                        shop: 'bg-purple-400 border-purple-400',
+                        star: 'bg-blue-800 border-blue-800',
+                        hike: 'bg-emerald-600 border-emerald-600'
+                    };
+                    return colors[type] || 'bg-gray-400 border-gray-400';
+                }
+            }));
+        });
+    </script>
+
+    <!-- Alpine.js (Loaded after logic is defined) -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nzGreen: '#5D7E68',
+                        nzCream: '#F9F7F2',
+                        nzDark: '#2C3E50',
+                        nzBlue: '#6B8E9B',
+                        nzAccent: '#D4A373',
+                        nzRed: '#E76F51'
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'float': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F9F7F2; -webkit-font-smoothing: antialiased; }
+        .ios-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-radius: 1.25rem;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .tap-highlight-transparent { -webkit-tap-highlight-color: transparent; }
+        
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+        
+        /* Custom scrollbar for desktop mostly */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        
+        .timeline-line {
+            position: absolute;
+            left: 7px;
+            top: 10px;
+            bottom: -20px;
+            width: 2px;
+            background-color: #E2E8F0;
+        }
+        .last-item .timeline-line { display: none; }
+    </style>
+</head>
+<body class="text-nzDark pb-28 tap-highlight-transparent min-h-screen" x-data="itineraryApp">
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 bg-nzCream/95 backdrop-blur-md border-b border-gray-100 pt-10 pb-3 px-6 transition-all duration-300 shadow-sm">
+        <div class="flex justify-between items-end max-w-2xl mx-auto">
+            <div>
+                <h2 class="text-[10px] font-bold tracking-[0.2em] text-nzGreen uppercase mb-1">New Zealand 2025-26</h2>
+                <h1 class="font-serif text-2xl font-bold text-gray-800">紐西蘭・夏日漫遊</h1>
+            </div>
+            <div class="text-right">
+                <span class="text-[10px] text-gray-400 block uppercase tracking-wide">Day</span>
+                <span class="text-2xl font-bold text-nzAccent font-serif" x-text="currentDayNum"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mt-28 px-4 max-w-2xl mx-auto space-y-5">
+
+        <!-- Tab Navigation -->
+        <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1 sticky top-[85px] z-40 bg-gradient-to-b from-[#F9F7F2] via-[#F9F7F2] to-transparent pt-2 px-1 -mx-1">
+            <template x-for="tab in tabs">
+                <button 
+                    @click="activeTab = tab.id; window.scrollTo({top: 0, behavior: 'smooth'})"
+                    :class="activeTab === tab.id ? 'bg-nzGreen text-white shadow-md transform scale-105' : 'bg-white text-gray-500 hover:bg-gray-50'"
+                    class="px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-200 flex-shrink-0 border border-transparent shadow-sm"
+                    x-text="tab.name">
+                </button>
+            </template>
+        </div>
+
+        <!-- 1. ITINERARY VIEW -->
+        <div x-show="activeTab === 'itinerary'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4">
+            
+            <!-- Flight Card (Special) -->
+            <div class="ios-card p-5 border-l-[6px] border-nzBlue relative overflow-hidden group">
+                <div class="absolute right-[-20px] top-[-20px] text-nzBlue/10 text-9xl transform rotate-12 group-hover:rotate-0 transition-transform duration-700 pointer-events-none">
+                    <i class="fa-solid fa-plane"></i>
+                </div>
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <span class="bg-nzBlue text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm tracking-wide">FLIGHT</span>
+                    <span class="text-xs font-mono text-gray-400">NZ Trip Start</span>
+                </div>
+                <div class="space-y-4 relative z-10">
+                    <div class="flex justify-between items-center">
+                        <div class="text-center">
+                            <div class="text-3xl font-serif font-bold text-gray-800">TPE</div>
+                            <div class="text-xs text-gray-500 font-medium">台北</div>
+                        </div>
+                        <div class="flex-1 px-4 text-center">
+                            <div class="text-[10px] text-gray-400 mb-1">11h 40m</div>
+                            <div class="w-full h-[2px] bg-gray-200 relative">
+                                <div class="absolute w-2 h-2 bg-nzBlue rounded-full right-0 top-[-3px]"></div>
+                                <div class="absolute w-2 h-2 bg-gray-300 rounded-full left-0 top-[-3px]"></div>
+                                <i class="fa-solid fa-plane text-nzBlue absolute top-[-7px] left-1/2 transform -translate-x-1/2 text-xs"></i>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-serif font-bold text-gray-800">AKL</div>
+                            <div class="text-xs text-gray-500 font-medium">奧克蘭</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-50 text-red-600 text-xs p-3 rounded-xl border border-red-100 flex items-start shadow-sm">
+                        <i class="fa-solid fa-triangle-exclamation mr-2 mt-0.5 text-sm"></i> 
+                        <div>
+                            <span class="font-bold block mb-0.5">轉機重要提醒</span>
+                            雖是聯程機票，但在奧克蘭必須<span class="font-bold underline">提領行李</span>並重新check-in國內線！
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loop through Days -->
+            <template x-for="(day, index) in days" :key="index">
+                <div class="ios-card overflow-hidden transition-all duration-300" 
+                     :class="{'ring-2 ring-nzGreen/30 shadow-float': openDay === index, 'opacity-75 grayscale-[0.3]': isPast(day.date) && openDay !== index}">
+                    
+                    <!-- Card Header -->
+                    <div @click="toggleDay(index)" class="p-5 flex justify-between items-center cursor-pointer active:bg-gray-50 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex flex-col items-center justify-center bg-gray-100 w-14 h-14 rounded-2xl text-center shadow-inner" :class="{'bg-nzGreen text-white shadow-none': openDay === index}">
+                                <span class="text-[10px] uppercase font-bold tracking-wider" x-text="formatMonth(day.date)"></span>
+                                <span class="text-xl font-bold leading-none font-serif" x-text="formatDate(day.date)"></span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg" x-text="day.title"></h3>
+                                <p class="text-xs text-gray-500 mt-1 font-medium flex items-center">
+                                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-nzAccent mr-1.5"></span>
+                                    <span x-text="day.route"></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition-transform duration-300" :class="{'rotate-180 bg-green-50 text-nzGreen': openDay === index}">
+                            <i class="fa-solid fa-chevron-down text-xs text-gray-400" :class="{'text-nzGreen': openDay === index}"></i>
+                        </div>
+                    </div>
+
+                    <!-- Card Body (Expandable) -->
+                    <div x-show="openDay === index" x-collapse class="bg-white border-t border-gray-100">
+                        <!-- Transport Info Bar -->
+                        <div class="px-5 py-3 bg-gray-50/80 flex items-center space-x-6 text-xs font-medium text-gray-600 border-b border-gray-100" x-show="day.driveTime !== '-'">
+                            <span class="flex items-center"><i class="fa-solid fa-road mr-2 text-gray-400"></i> <span x-text="day.km"></span></span>
+                            <span class="flex items-center"><i class="fa-regular fa-clock mr-2 text-gray-400"></i> <span x-text="day.driveTime"></span></span>
+                        </div>
+
+                        <!-- Timeline Activities -->
+                        <div class="p-5 pb-2">
+                            <div class="ml-2 pl-4 space-y-6 relative">
+                                <template x-for="(item, idx) in day.activities">
+                                    <div class="relative" :class="{'last-item': idx === day.activities.length - 1}">
+                                        <!-- Vertical Line -->
+                                        <div class="timeline-line"></div>
+                                        
+                                        <!-- Dot -->
+                                        <div class="absolute -left-[23px] top-1 w-4 h-4 rounded-full border-[3px] border-white shadow-sm z-10" 
+                                             :class="getDotColor(item.type)">
+                                        </div>
+
+                                        <div class="flex justify-between items-start group">
+                                            <div class="pr-2">
+                                                <h4 class="font-bold text-sm text-gray-800 leading-tight" x-text="item.name"></h4>
+                                                <p class="text-xs text-gray-500 mt-1.5 leading-relaxed" x-text="item.desc"></p>
+                                                
+                                                <!-- AI Tip Tag -->
+                                                <div x-show="item.tip" class="mt-2.5 inline-flex items-start bg-amber-50 text-amber-800 text-[10px] px-2.5 py-1.5 rounded-lg border border-amber-100 max-w-full">
+                                                    <i class="fa-solid fa-lightbulb mr-1.5 mt-0.5 text-amber-500"></i> 
+                                                    <span class="font-medium" x-text="item.tip"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Map Button -->
+                                            <a :href="getMapLink(item.name)" target="_blank" class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-nzGreen hover:text-white transition-all shadow-sm active:scale-95">
+                                                <i class="fa-solid fa-location-arrow text-xs"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Accommodation Block -->
+                            <div class="mt-6 mb-2 pt-4 border-t border-gray-100" x-show="day.stay && day.stay !== '-'">
+                                <div class="flex items-start bg-indigo-50/50 p-3 rounded-xl border border-indigo-50">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500 mr-3 flex-shrink-0">
+                                        <i class="fa-solid fa-bed text-xs"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-wide mb-0.5">Tonight's Stay</div>
+                                        <div class="text-sm font-bold text-gray-800" x-text="day.stay"></div>
+                                        <div class="text-xs text-gray-500 mt-0.5" x-text="day.stayAddr"></div>
+                                    </div>
+                                    <a x-show="day.stayAddr" :href="getMapLink(day.stayAddr)" target="_blank" class="text-xs font-bold text-indigo-600 bg-white px-3 py-1.5 rounded-full shadow-sm border border-indigo-100 self-center">
+                                        導航
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            
+            <div class="h-8"></div>
+        </div>
+
+        <!-- 2. GUIDE VIEW -->
+        <div x-show="activeTab === 'guide'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="space-y-6 pb-20">
+            
+            <!-- Weather Widget -->
+            <div class="ios-card p-6 rounded-3xl bg-gradient-to-br from-[#E0F2F1] to-white border-none shadow-soft">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-serif font-bold text-lg text-teal-900">12月-1月 天氣指南</h3>
+                    <span class="bg-white/80 px-2 py-1 rounded text-[10px] font-bold text-teal-700">夏季</span>
+                </div>
+                
+                <div class="flex justify-between gap-4">
+                    <div class="flex-1 text-center bg-white/60 p-3 rounded-2xl">
+                        <i class="fa-solid fa-wind text-2xl text-blue-300 mb-2"></i>
+                        <div class="text-xs font-bold text-gray-600 mb-1">南島</div>
+                        <div class="text-lg font-bold text-gray-800">10-22°C</div>
+                        <div class="text-[10px] text-gray-400 mt-1">早晚溫差大</div>
+                    </div>
+                    <div class="flex-1 text-center bg-white/60 p-3 rounded-2xl">
+                        <i class="fa-solid fa-sun text-2xl text-orange-400 mb-2"></i>
+                        <div class="text-xs font-bold text-gray-600 mb-1">北島</div>
+                        <div class="text-lg font-bold text-gray-800">14-25°C</div>
+                        <div class="text-[10px] text-gray-400 mt-1">陽光強烈</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 space-y-2">
+                    <div class="flex items-start text-xs text-teal-800 bg-white/50 p-2.5 rounded-lg">
+                        <i class="fa-solid fa-shirt mt-0.5 mr-2 text-teal-600"></i>
+                        <span><strong>穿搭重點：</strong> 洋蔥式穿法是必須。南島(尤其米佛峽灣)需備防風防水外套與毛帽。</span>
+                    </div>
+                    <div class="flex items-start text-xs text-teal-800 bg-white/50 p-2.5 rounded-lg">
+                        <i class="fa-solid fa-shield-virus mt-0.5 mr-2 text-teal-600"></i>
+                        <span><strong>防曬與防蟲：</strong> 紐西蘭紫外線極強，務必擦防曬。沙蠅(Sandfly)多，需備防蚊液。</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Essential Cards -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="ios-card p-4 flex flex-col items-center justify-center text-center bg-white">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 mb-2">
+                        <i class="fa-solid fa-passport"></i>
+                    </div>
+                    <h4 class="font-bold text-sm text-gray-800">NZeTA 簽證</h4>
+                    <p class="text-[10px] text-gray-400 mt-1">需事前申請核准<br>含IVL旅遊稅</p>
+                </div>
+                <div class="ios-card p-4 flex flex-col items-center justify-center text-center bg-white">
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-500 mb-2">
+                        <i class="fa-solid fa-wifi"></i>
+                    </div>
+                    <h4 class="font-bold text-sm text-gray-800">網路通訊</h4>
+                    <p class="text-[10px] text-gray-400 mt-1">山區訊號差<br>下載離線地圖</p>
+                </div>
+            </div>
+
+            <!-- Souvenir List -->
+            <div class="ios-card p-6">
+                <h3 class="font-serif font-bold text-lg mb-4 flex items-center text-gray-800">
+                    <span class="w-8 h-8 rounded-full bg-nzAccent/20 flex items-center justify-center text-nzAccent mr-2 text-sm"><i class="fa-solid fa-gift"></i></span>
+                    必買伴手禮
+                </h3>
+                <div class="space-y-3">
+                    <template x-for="item in ['Whittakers 巧克力 (超市掃貨)', 'Manuka 麥盧卡蜂蜜 (UMF認證)', 'Cookie Time 餅乾', 'Lanolin 綿羊油保養品', '羊駝被 / 羊毛製品']">
+                        <div class="flex items-center text-sm text-gray-600 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fa-regular fa-square-check text-nzGreen mr-3"></i>
+                            <span x-text="item"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Driving Rules -->
+            <div class="ios-card p-5 border-l-4 border-nzRed bg-red-50/30">
+                <h3 class="font-bold text-nzRed mb-3 flex items-center">
+                    <i class="fa-solid fa-car-side mr-2"></i> 自駕生死守則
+                </h3>
+                <ul class="text-sm text-gray-700 space-y-3 list-none">
+                    <li class="flex items-start">
+                        <span class="bg-nzRed text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5">重要</span>
+                        <span>右駕靠左！雨刷跟方向燈相反，轉彎時心中默念「靠左靠左」。</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5">規則</span>
+                        <span>圓環 (Roundabout) 必須禮讓右方來車。</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="bg-gray-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 mt-0.5">路況</span>
+                        <span>單線橋樑 (One Lane Bridge) 需看箭頭指示優先權。</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 3. BUDGET VIEW -->
+        <div x-show="activeTab === 'budget'" x-transition:enter="transition ease-out duration-300" class="space-y-4">
+            <div class="ios-card overflow-hidden">
+                <div class="bg-nzDark p-6 text-white relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full"></div>
+                    <div class="absolute -left-4 -bottom-4 w-16 h-16 bg-white/10 rounded-full"></div>
+                    <h3 class="font-serif font-bold text-lg relative z-10">預訂門票估算</h3>
+                    <p class="text-white/60 text-xs mt-1 relative z-10">每人預估費用 (TWD)</p>
+                    <div class="mt-4 text-3xl font-bold relative z-10">$12,454</div>
+                </div>
+                
+                <div class="p-0">
+                    <div class="max-h-[60vh] overflow-y-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-gray-400 uppercase bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="px-5 py-3 font-medium">項目</th>
+                                    <th class="px-5 py-3 text-right font-medium">金額</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <template x-for="item in budgetItems">
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-5 py-3.5 text-gray-700 font-medium" x-text="item.name"></td>
+                                        <td class="px-5 py-3.5 text-right font-bold text-gray-900" x-text="item.cost"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-5 py-3 text-[10px] text-gray-400 text-center border-t border-gray-100">
+                    * 匯率浮動，實際刷卡金額以當日銀行為準
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation (Floating) -->
+    <nav class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-nzDark/90 text-white rounded-full px-8 py-3.5 shadow-float flex space-x-10 z-50 backdrop-blur-xl border border-white/10">
+        <button @click="activeTab = 'itinerary'" :class="activeTab === 'itinerary' ? 'text-nzAccent' : 'text-gray-400'" class="flex flex-col items-center transition-all duration-300 hover:text-white">
+            <i class="fa-solid fa-map text-lg mb-1"></i>
+            <span class="text-[9px] font-bold">行程</span>
+        </button>
+        <button @click="activeTab = 'guide'" :class="activeTab === 'guide' ? 'text-nzAccent' : 'text-gray-400'" class="flex flex-col items-center transition-all duration-300 hover:text-white">
+            <i class="fa-solid fa-compass text-lg mb-1"></i>
+            <span class="text-[9px] font-bold">攻略</span>
+        </button>
+        <button @click="activeTab = 'budget'" :class="activeTab === 'budget' ? 'text-nzAccent' : 'text-gray-400'" class="flex flex-col items-center transition-all duration-300 hover:text-white">
+            <i class="fa-solid fa-receipt text-lg mb-1"></i>
+            <span class="text-[9px] font-bold">預算</span>
+        </button>
+    </nav>
+</body>
+</html>
