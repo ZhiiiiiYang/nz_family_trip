@@ -9,9 +9,7 @@
     
     <!-- App Icon & Title (iOS Home Screen) -->
     <meta name="apple-mobile-web-app-title" content="NZ Family Trip">
-    
-    <!-- 設定 App Icon (請確保 GitHub 上傳的檔名為 icon.png) -->
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="shortcut icon" type="image/png" href="icon.png">
 
@@ -30,7 +28,7 @@
                 openDay: 0, 
                 currentDayNum: 1,
                 
-                // Ledger Data (with Persistence)
+                // Ledger Data
                 ledger: JSON.parse(localStorage.getItem('nz_ledger')) || [
                     {id: 1, name: '米佛峽灣遊船', cost: 570},
                     {id: 2, name: 'RealNZ 螢火蟲洞', cost: 2360},
@@ -38,21 +36,22 @@
                     {id: 4, name: 'Heritage 農場', cost: 855},
                     {id: 5, name: '終極樹冠之旅', cost: 4613},
                     {id: 6, name: '空中纜車+滑板車', cost: 1629},
-                    {id: 7, name: 'ZORB 水球', cost: 1692}
+                    {id: 7, name: 'ZORB 水球', cost: 1692},
+                    {id: 8, name: '凱庫拉賞鯨', cost: 0} 
                 ],
                 newEntryName: '',
                 newEntryCost: '',
 
-                // Weather Data (Mock for Summer)
+                // Weather Data
                 weatherSouth: [
-                    {day: '今天', icon: 'fa-sun', temp: '18°C', desc: '晴朗乾燥'},
-                    {day: '明天', icon: 'fa-cloud-sun', temp: '16°C', desc: '多雲午後雨'},
-                    {day: '週三', icon: 'fa-cloud-rain', temp: '14°C', desc: '早晚偏冷'},
+                    {day: '今天', icon: 'fa-sun', temp: '18°C', desc: '基督城/晴朗'},
+                    {day: '明天', icon: 'fa-cloud-sun', temp: '16°C', desc: '蒂卡波/多雲'},
+                    {day: '週三', icon: 'fa-cloud-rain', temp: '14°C', desc: '峽灣/有雨'},
                 ],
                 weatherNorth: [
-                    {day: '今天', icon: 'fa-sun', temp: '24°C', desc: '陽光普照'},
-                    {day: '明天', icon: 'fa-sun', temp: '25°C', desc: '紫外線強'},
-                    {day: '週三', icon: 'fa-cloud-sun', temp: '23°C', desc: '舒適宜人'},
+                    {day: '今天', icon: 'fa-sun', temp: '24°C', desc: '奧克蘭/熱'},
+                    {day: '明天', icon: 'fa-sun', temp: '25°C', desc: '羅托魯瓦/晴'},
+                    {day: '週三', icon: 'fa-cloud-sun', temp: '23°C', desc: '陶波/舒適'},
                 ],
 
                 // Souvenirs
@@ -67,9 +66,9 @@
                 // Extra Trips
                 extraTrips: [
                     {name: 'Arrowtown 箭鎮', region: '近皇后鎮', desc: '魔戒取景地，淘金歷史古鎮', query: 'Arrowtown'},
-                    {name: 'Akaroa 阿卡羅阿', region: '近基督城', desc: '充滿法式風情的海港小鎮', query: 'Akaroa'},
-                    {name: 'Mt. John 天文台', region: '蒂卡波', desc: '俯瞰牛奶湖的最佳制高點', query: 'Mount John Observatory'},
-                    {name: 'Hell\'s Gate 地獄之門', region: '羅托魯瓦', desc: '獨特的泥漿浴溫泉體驗', query: 'Hells Gate Geothermal Park'},
+                    {name: 'Mt. John 天文台', region: '蒂卡波', desc: '俯瞰牛奶湖的最佳制高點(下午3點關)', query: 'Mount John Observatory'},
+                    {name: 'Hell\'s Gate 地獄之門', region: '羅托魯瓦', desc: '泥漿浴溫泉體驗', query: 'Hells Gate Geothermal Park'},
+                    {name: 'Kaikoura Peninsula', region: '凱庫拉', desc: '海豹步道', query: 'Kaikoura Peninsula Walkway'},
                 ],
 
                 tabs: [
@@ -80,212 +79,245 @@
 
                 days: [
                     {
+                        date: '2025-12-21',
+                        title: '出發！前往紐西蘭',
+                        route: 'TPE -> AKL',
+                        km: '-',
+                        driveTime: '-',
+                        stay: '機上',
+                        stayAddr: '', 
+                        activities: [
+                            {name: '前往桃園機場', desc: '15:00 出發前往機場。', type: 'transport', nav: false},
+                            {name: '搭機', desc: '18:30 飛機起飛。', type: 'transport', nav: false}
+                        ]
+                    },
+                    {
                         date: '2025-12-22',
                         title: '抵達基督城',
                         route: 'AKL -> CHC',
-                        km: '3km',
-                        driveTime: '10m',
-                        stay: 'Christchurch 住宿',
-                        stayAddr: 'Christchurch, New Zealand', 
+                        km: '-',
+                        driveTime: '-',
+                        stay: '50 Skyhawk Road',
+                        stayAddr: '50 Skyhawk Road, Christchurch, New Zealand', 
                         activities: [
-                            {name: '抵達奧克蘭機場 (AKL)', desc: '12:00 抵達。務必提領行李，轉國內線。', type: 'transport', tip: '轉機時間緊湊(1h50m)，請快步移動。'},
-                            {name: '飛往基督城 (CHC)', desc: '13:25 抵達。取租車。', type: 'transport'},
-                            {name: '超市採買', desc: 'Pack\'n Save 或 Countdown 買水與早餐。', type: 'food'}
+                            {name: '抵達奧克蘭 (AKL)', desc: '10:10 抵達。務必提領行李，轉國內線。', type: 'transport', tip: '轉機時間緊湊，請快步移動。', nav: false},
+                            {name: '飛往基督城 (CHC)', desc: '12:00 AKL 起飛 -> 13:25 抵達。', type: 'transport', nav: false},
+                            {name: '機場會合', desc: '領完行李去國際機場領行李處，等楊皓 14:00 抵達。', type: 'transport', nav: false},
+                            {name: '取租車', desc: '一起前往租車處。確認賞鯨換車事宜。', type: 'transport', query: 'Ezi Car Rental Christchurch Airport'},
+                            {name: '入住/採買', desc: '民宿對面是新世界超市/購物中心。', type: 'food', query: 'New World Spitfire Square'}
                         ]
                     },
                     {
                         date: '2025-12-23',
-                        title: '前進藍色牛奶湖',
-                        route: '基督城 -> 特威澤爾',
+                        title: '蒂卡波與觀星',
+                        route: '基督城 -> 蒂卡波 -> 特威澤爾',
                         km: '280km',
-                        driveTime: '3h',
-                        stay: 'Twizel 住宿',
-                        stayAddr: 'Twizel, New Zealand',
+                        driveTime: '3.5h',
+                        stay: '9 Harris Place, Twizel',
+                        stayAddr: '9 Harris Place, Twizel, New Zealand',
                         activities: [
-                            {name: 'Lake Tekapo 蒂卡波湖', desc: '魯冰花盛開季，絕美湖景。', type: 'view', tip: '湖邊風大，記得戴帽子。'},
-                            {name: '好牧羊人教堂', desc: '經典地標。', type: 'view'},
-                            {name: 'Lake Pukaki', desc: '著名的藍色牛奶湖，可遠眺庫克山。', type: 'view', tip: '必吃路邊 Mt Cook Alpine Salmon 生魚片！'},
-                            {name: '暗空保護區觀星', desc: '若天氣好，抬頭即見銀河。', type: 'star'}
+                            {name: 'Lake Tekapo', desc: '看魯冰花。', type: 'view', drive: '開車約 3 小時'},
+                            {name: 'Lake Pukaki', desc: '順路看薰衣草，藍色牛奶湖。', type: 'view', drive: '開車約 30 分'},
+                            {name: '約翰山天文台', desc: '考慮是否上去看景喝咖啡 (3點關門可能來不及)。', type: 'view', query: 'Mount John Observatory', drive: '開車約 40 分'},
+                            {name: '入住特威澤爾', desc: '開車1小時入住。夜觀星星。', type: 'stay', query: '9 Harris Place, Twizel, New Zealand', drive: '開車約 45 分'}
                         ]
                     },
                     {
                         date: '2025-12-24',
-                        title: '平安夜玩瓦納卡',
+                        title: '瓦納卡聖誕夜',
                         route: '特威澤爾 -> 瓦納卡',
-                        km: '120km',
+                        km: '140km',
                         driveTime: '2h',
-                        stay: 'Wanaka 住宿',
-                        stayAddr: 'Wanaka, New Zealand',
+                        stay: '5A Kidds Way, Albert Town',
+                        stayAddr: '5A Kidds Way, Albert Town, Wanaka, New Zealand',
                         activities: [
-                            {name: 'Wanaka Lavender Farm', desc: '紫色夢幻花海，吃薰衣草冰淇淋。', type: 'view'},
-                            {name: 'Puzzling World', desc: '錯視藝術迷宮。', type: 'fun', tip: '12/25 沒開，今天先玩！'},
-                            {name: '瓦納卡孤獨樹', desc: '湖中孤樹，黃昏最美。', type: 'view'},
-                            {name: '平安夜大餐', desc: '餐廳需預訂，或超市買牛排回民宿煮。', type: 'food'}
+                            {name: '早點出發', desc: '因明天聖誕節很多沒開，今天先玩。', type: 'transport', nav: false},
+                            {name: 'Wanaka Lavender Farm', desc: '看羊駝、小動物。', type: 'view', drive: '開車約 1.5 小時'},
+                            {name: 'Puzzling World', desc: '錯視藝術與迷宮。', type: 'fun', drive: '開車約 5 分'},
+                            {name: '聖誕夜晚餐', desc: '參加聖誕夜活動，湖邊看風景。', type: 'food', query: 'Wanaka Lakefront', drive: '前往市區'}
                         ]
                     },
                     {
                         date: '2025-12-25',
-                        title: '聖誕節慢活',
+                        title: '瓦納卡聖誕節',
                         route: '瓦納卡一日遊',
                         km: '-',
                         driveTime: '-',
-                        stay: 'Wanaka 住宿',
-                        stayAddr: 'Wanaka, New Zealand',
+                        stay: '5A Kidds Way, Albert Town',
+                        stayAddr: '5A Kidds Way, Albert Town, Wanaka, New Zealand',
                         activities: [
-                            {name: 'Mount Iron Track', desc: '健行約2小時，俯瞰全景。', type: 'hike'},
-                            {name: 'Rippon Vineyard', desc: '世界最美酒莊之一，免費品酒。', type: 'view', tip: '留意聖誕節營業時間，通常下午5點關。'},
-                            {name: '湖畔野餐', desc: '享受悠閒聖誕午後。', type: 'food'}
+                            {name: 'Mount Iron Track', desc: '健行約2小時。', type: 'hike', drive: '開車約 5 分'},
+                            {name: 'Rippon Vineyard', desc: '免費品酒，拍照葡萄園 (17:00關)。', type: 'view', drive: '開車約 10 分'},
+                            {name: '自由活動', desc: '可考慮滑翔翼。社區有糕點薯條店。', type: 'fun', nav: false}
                         ]
                     },
                     {
                         date: '2025-12-26',
-                        title: '水果之鄉與螢火蟲',
+                        title: '水果鎮與螢火蟲',
                         route: '瓦納卡 -> 蒂阿瑙',
-                        km: '230km',
-                        driveTime: '3h',
-                        stay: 'Te Anau 住宿',
-                        stayAddr: 'Te Anau, New Zealand',
+                        km: '260km',
+                        driveTime: '4h',
+                        stay: '6 McKerrow Street, Te Anau',
+                        stayAddr: '6 McKerrow Street, Te Anau, New Zealand',
                         activities: [
-                            {name: 'Cromwell 水果鎮', desc: 'Jones Family Fruit Stall 買櫻桃、水蜜桃。', type: 'food'},
-                            {name: 'RealNZ 螢火蟲洞', desc: '搭船入洞看藍光星河。', type: 'view', tip: '洞內不能拍照，用心欣賞。'},
-                            {name: 'Te Anau 湖畔', desc: '南島第一大湖。', type: 'view'}
+                            {name: '出發', desc: '09:00 離開，早起出發。', type: 'transport', nav: false},
+                            {name: 'Cromwell 水果', desc: 'Cheeki Cherries 摘櫻桃、Jones Family 買水果(13:00需離開)。', type: 'food', query: 'Jones Family Fruit Stall', drive: '開車約 45 分'},
+                            {name: 'RealNZ 螢火蟲洞', desc: '報到地址: 85 Lakefront Drive。17:20 抵達驗票。', type: 'view', query: 'RealNZ Te Anau Visitor Centre', drive: '開車約 3.5 小時'},
+                            {name: '入住蒂阿瑙', desc: '住湖及餐廳附近。', type: 'stay', query: '6 McKerrow Street, Te Anau, New Zealand', drive: '開車約 2 分'}
                         ]
                     },
                     {
                         date: '2025-12-27',
-                        title: '世界遺產米佛峽灣',
-                        route: '蒂阿瑙 -> 米佛 -> 但尼丁',
-                        km: '430km',
-                        driveTime: '9h(含遊)',
-                        stay: 'Dunedin 住宿',
-                        stayAddr: 'Dunedin, New Zealand',
+                        title: '米佛峽灣一日遊',
+                        route: '蒂阿瑙 -> 峽灣 -> 但尼丁',
+                        km: '400km',
+                        driveTime: '8h+',
+                        stay: '2 Jenkins St, Dunedin',
+                        stayAddr: '2 Jenkins Street, Dunedin, New Zealand',
                         activities: [
-                            {name: '前往米佛峽灣', desc: '07:30 出發。經鏡湖、Eglinton Valley。', type: 'transport', tip: '容易暈車者請先吃藥。'},
-                            {name: '峽灣遊船', desc: '11:00 船班。看瀑布、海豹。', type: 'view', tip: '甲板風極大，需穿防風防水外套。'},
-                            {name: '長途拉車至但尼丁', desc: '經 Lumsden 休息。', type: 'transport'}
+                            {name: '前往峽灣', desc: '07:30 出發。導航至遊客中心。', type: 'transport', query: 'Milford Sound Visitor Terminal'},
+                            {name: 'Eglinton Valley', desc: '車邊拍照五分鐘。', type: 'view', query: 'Eglinton Valley', drive: '開車約 45 分'},
+                            {name: 'Mirror Lakes', desc: '湖面倒映山景停留十分鐘。', type: 'view', query: 'Mirror Lakes Walk', drive: '開車約 5 分'},
+                            {name: '峽灣遊船', desc: '11:00 船班 (10:40 報到)。遊玩約2小時。', type: 'view', query: 'Milford Sound Visitor Terminal', drive: '開車約 1 小時'},
+                            {name: '回程休息: Knobs Flat', desc: '有洗手間、咖啡車。', type: 'transport', query: 'Knobs Flat', drive: '回程路途'},
+                            {name: 'Te Anau 加油', desc: '經過蒂阿瑙加油。', type: 'transport', query: 'Te Anau', drive: '開車約 1 小時'},
+                            {name: 'Lumsden', desc: '咖啡休息點。', type: 'food', query: 'Lumsden'},
+                            {name: 'Gore', desc: '中途休息伸展並加油。', type: 'transport', query: 'Gore', drive: '開車約 1 小時'},
+                            {name: '入住但尼丁', desc: '行李需人工搬三層樓。', type: 'stay', query: '2 Jenkins Street, Dunedin, New Zealand', drive: '開車約 2 小時'}
                         ]
                     },
                     {
                         date: '2025-12-28',
-                        title: '蘇格蘭風情古都',
+                        title: '但尼丁與企鵝',
                         route: '但尼丁 -> 奧瑪魯',
                         km: '120km',
                         driveTime: '1.5h',
-                        stay: 'Oamaru 住宿',
-                        stayAddr: 'Oamaru, New Zealand',
+                        stay: '49 Arun Street, Oamaru',
+                        stayAddr: '49 Arun Street, Oamaru, New Zealand',
                         activities: [
-                            {name: '但尼丁火車站', desc: '華麗復古建築。', type: 'view'},
-                            {name: '鮑德溫街 (Baldwin St)', desc: '世界最陡街道。', type: 'fun'},
-                            {name: '奧瑪魯維多利亞老街', desc: '蒸汽龐克風格。', type: 'view'},
-                            {name: '藍企鵝歸巢', desc: '約 20:45 開始。', type: 'view', tip: '海邊晚上極冷，禁止拍照。'}
+                            {name: '但尼丁火車站', desc: '參觀復古車站。', type: 'view', query: 'Dunedin Railway Station', drive: '開車約 10 分'},
+                            {name: '鮑德溫街', desc: '世界最斜街道。', type: 'view', query: 'Baldwin Street', drive: '開車約 10 分'},
+                            {name: 'Tunnel Beach', desc: '走到盡頭停車場，健行來回1小時。', type: 'hike', query: 'Tunnel Beach Track', drive: '開車約 25 分'},
+                            {name: '摩拉基圓石', desc: '經過龍珠石。', type: 'view', query: 'Moeraki Boulders Beach', drive: '開車約 1 小時'},
+                            {name: '奧瑪魯老街', desc: '維多利亞風情(Heritage Precinct)。', type: 'view', query: 'Oamaru\'s Heritage Precinct', drive: '開車約 40 分'},
+                            {name: '企鵝歸巢', desc: '20:04 集合。South Hill。', type: 'view', query: '17 Waterfront Road, South Hill, Oamaru 9400', drive: '開車約 3 分'},
+                            {name: '回程', desc: '看完企鵝回民宿休息。', type: 'transport', query: '49 Arun Street, Oamaru, New Zealand', drive: '開車約 5 分'}
                         ]
                     },
                     {
                         date: '2025-12-29',
-                        title: '東海岸返回',
+                        title: '返回基督城',
                         route: '奧瑪魯 -> 基督城',
                         km: '250km',
                         driveTime: '3h',
-                        stay: 'Christchurch 住宿',
-                        stayAddr: 'Christchurch, New Zealand',
+                        stay: '5/54 Stewart St, CHC',
+                        stayAddr: '54 Stewart Street, Christchurch, New Zealand',
                         activities: [
-                            {name: 'Caroline Bay', desc: '蒂瑪魯海灘，可能有海豹。', type: 'view'},
-                            {name: '抵達基督城還車', desc: '算好時間還車。', type: 'transport'}
+                            {name: 'Caroline Bay', desc: '看海豹(看運氣)、玫瑰園。', type: 'view', query: 'Caroline Bay, Timaru 7910', drive: '開車約 1 小時'},
+                            {name: '入住基督城', desc: '連住三天。', type: 'stay', query: '54 Stewart Street, Christchurch, New Zealand', drive: '開車約 2 小時'}
                         ]
                     },
                     {
                         date: '2025-12-30',
-                        title: '花園城市漫遊',
-                        route: '基督城自由行',
-                        km: '-',
-                        driveTime: '-',
-                        stay: 'Christchurch 住宿',
-                        stayAddr: 'Christchurch, New Zealand',
+                        title: '凱庫拉賞鯨',
+                        route: '基督城 <-> 凱庫拉',
+                        km: '360km(來回)',
+                        driveTime: '5h',
+                        stay: '5/54 Stewart St, CHC',
+                        stayAddr: '54 Stewart Street, Christchurch, New Zealand',
                         activities: [
-                            {name: '植物園 & 雅芳河', desc: '英式撐船體驗。', type: 'view'},
-                            {name: '紙板教堂', desc: '地震後重建地標。', type: 'view'},
-                            {name: 'Riverside Market', desc: '美食市集晚餐。', type: 'food'}
+                            {name: '出發', desc: '07:40 出發。開2.5小時。', type: 'transport', nav: false},
+                            {name: '賞鯨報到', desc: '10:45 前到達。Whaleway Station Road。', type: 'fun', query: 'Whaleway Station Road, Kaikōura 7340', drive: '開車約 2.5 小時'},
+                            {name: '午餐', desc: 'Café Encounter 或 Seafood BBQ。', type: 'food', query: '96 Esplanade, Kaikōura 7300', drive: '開車約 5 分'},
+                            {name: '看海豹', desc: 'Kaikoura Peninsula Walkway。', type: 'view', query: 'Kaikoura Peninsula Walkway, Kaikoura Peninsula, Kaikoura 7300', drive: '開車約 10 分'},
+                            {name: '回程', desc: '回民宿及還車。', type: 'transport', query: '54 Stewart Street, Christchurch', drive: '開車約 2.5 小時'}
                         ]
                     },
                     {
                         date: '2025-12-31',
-                        title: '紐西蘭跨年！',
-                        route: '基督城',
+                        title: '基督城跨年',
+                        route: '基督城自由行',
                         km: '-',
                         driveTime: '-',
-                        stay: 'Christchurch 住宿',
-                        stayAddr: 'Christchurch, New Zealand',
+                        stay: '5/54 Stewart St, CHC',
+                        stayAddr: '54 Stewart Street, Christchurch, New Zealand',
                         activities: [
-                            {name: 'North Hagley Park', desc: '跨年音樂會。', type: 'fun', tip: '帶野餐墊與保暖衣物。'},
-                            {name: '3...2...1 Happy New Year!', desc: '全球最早跨年國家之一。', type: 'fun'}
+                            {name: '市區漫遊', desc: '植物園、雅芳河撐船、美術館、市集。', type: 'view', nav: false},
+                            {name: '跨年音樂會', desc: 'North Hagley Park。位子不擠但會冷。', type: 'fun', query: '14 Riccarton Avenue, Christchurch Central City, Christchurch 8011'},
+                            {name: '回程', desc: '跨年結束回民宿。', type: 'transport', query: '54 Stewart Street, Christchurch', drive: '開車約 10 分'}
                         ]
                     },
                     {
                         date: '2026-01-01',
-                        title: '飛向北島火山',
-                        route: 'CHC -> Ohakune',
-                        km: '320km',
-                        driveTime: '4.5h',
-                        stay: 'Ohakune 住宿',
-                        stayAddr: 'Ohakune, New Zealand',
+                        title: '飛往北島',
+                        route: 'CHC -> WLG -> Ohakune',
+                        km: '290km',
+                        driveTime: '4h',
+                        stay: 'Ohakune Carrot Park',
+                        stayAddr: 'Ohakune Carrot Adventure Park, New Zealand',
                         activities: [
-                            {name: '飛往威靈頓 (WLG)', desc: '12:15 起飛，13:30 抵達。', type: 'transport'},
-                            {name: '租車北上', desc: '前往國家公園區。', type: 'transport'}
+                            {name: '前往機場', desc: '10:00 退房預約車子去機場。', type: 'transport', query: 'Christchurch Airport'},
+                            {name: '飛往威靈頓', desc: '12:15 飛 -> 13:30 到。', type: 'transport', nav: false},
+                            {name: '租車北上', desc: '14:30 租完車。確認延後還車計價。', type: 'transport', query: 'Wellington Airport Car Rental'},
+                            {name: '前往 Ohakune', desc: '開4小時(中途 Wild Bean Café 休息)。', type: 'transport', nav: false, drive: '開車約 4 小時'},
+                            {name: '入住', desc: '胡蘿蔔公園後面。無冷氣有風扇。', type: 'stay', query: 'Ohakune Carrot Adventure Park'}
                         ]
                     },
                     {
                         date: '2026-01-02',
-                        title: '火山與陶波湖',
+                        title: '火山與陶波',
                         route: 'Ohakune -> 陶波',
                         km: '150km',
                         driveTime: '2h',
-                        stay: '10 Wiremu Street, Turangi',
-                        stayAddr: '10 Wiremu Street, Turangi',
+                        stay: '10 Wiremu St, Tūrangi',
+                        stayAddr: '10 Wiremu Street, Turangi, New Zealand',
                         activities: [
-                            {name: 'Whakapapa Village', desc: '眺望 Ruapehu 火山。', type: 'view'},
-                            {name: 'Taranaki Falls', desc: '步道健行看瀑布。', type: 'hike'},
-                            {name: '陶波麥當勞', desc: '在飛機裡吃漢堡。', type: 'food'},
-                            {name: 'Huka Prawn Park', desc: '釣蝦吃蝦親子樂。', type: 'fun'}
+                            {name: 'Ruapehu 火山', desc: 'Iwikau Village 看全貌。Meads Wall 步道(15分)。', type: 'view', query: 'Iwikau Village', drive: '開車約 45 分'},
+                            {name: '瀑布步道', desc: 'Tawhai Falls (20分) 或 Taranaki Falls (2-3小時)。', type: 'hike', query: 'Taranaki Falls Track'},
+                            {name: '前往陶波', desc: '下午開 1.5 小時。', type: 'transport', nav: false, drive: '開車約 1.5 小時'},
+                            {name: 'Huka Prawn Park', desc: '吃蝦、釣蝦、玩水槍(帶衣物)。', type: 'fun', query: 'Huka Prawn Park'}
                         ]
                     },
                     {
                         date: '2026-01-03',
-                        title: '森林樹冠層探險',
+                        title: '羅托魯瓦探險',
                         route: '陶波 -> 羅托魯瓦',
                         km: '80km',
                         driveTime: '1h',
-                        stay: 'Rotorua 住宿',
-                        stayAddr: 'Rotorua, New Zealand',
+                        stay: '4 Westbourne Ave, Rotorua',
+                        stayAddr: '4 Westbourne Avenue, Rotorua, New Zealand',
                         activities: [
-                            {name: 'Canopy Tours', desc: '3小時樹冠層滑索，刺激！', type: 'fun'},
-                            {name: 'Redwoods Treewalk', desc: '夜間紅木森林吊橋，如阿凡達場景。', type: 'view'}
+                            {name: '前往羅托魯瓦', desc: '經 Wildwood Farm 花卉農場。', type: 'transport', query: 'Wildwood Farm', drive: '開車約 1 小時'},
+                            {name: 'Skyline', desc: '空中纜車+5圈滑板車 (約3小時)。', type: 'fun', query: 'Skyline Rotorua'},
+                            {name: '紅木森林', desc: 'Redwoods Treewalk 夜間點燈步道。', type: 'view', query: 'Redwoods Treewalk'}
                         ]
                     },
                     {
                         date: '2026-01-04',
-                        title: '農場與纜車',
-                        route: '羅托魯瓦',
+                        title: '樹冠與地熱',
+                        route: '羅托魯瓦一日遊',
                         km: '-',
                         driveTime: '-',
-                        stay: 'Rotorua 住宿',
-                        stayAddr: 'Rotorua, New Zealand',
+                        stay: '4 Westbourne Ave, Rotorua',
+                        stayAddr: '4 Westbourne Avenue, Rotorua, New Zealand',
                         activities: [
-                            {name: 'Agrodome Heritage 農場', desc: '摸羊駝、看剪羊毛秀。', type: 'fun'},
-                            {name: 'Skyline Rotorua', desc: '纜車+Luge滑板車(5圈)。', type: 'fun', tip: '滑板車超好玩，必玩！'}
+                            {name: '樹冠層滑索', desc: '09:15 Canopy Tours (3.5小時)。', type: 'fun', query: 'Rotorua Canopy Tours'},
+                            {name: '地獄之門', desc: '午餐後去地熱區及泥浴體驗。', type: 'view', query: 'Hells Gate Geothermal Park'},
+                            {name: 'Heritage 農場', desc: '16:00 前去與動物互動。', type: 'fun', query: 'Agrodome'}
                         ]
                     },
                     {
                         date: '2026-01-05',
-                        title: '地熱奇觀與滾球',
-                        route: '羅托魯瓦',
+                        title: '間歇泉與滾球',
+                        route: '羅托魯瓦一日遊',
                         km: '-',
                         driveTime: '-',
                         stay: '4 Westbourne Ave, Rotorua',
-                        stayAddr: '4 Westbourne Avenue, Rotorua',
+                        stayAddr: '4 Westbourne Avenue, Rotorua, New Zealand',
                         activities: [
-                            {name: 'Lady Knox Geyser', desc: '10:15 準時噴發。', type: 'view'},
-                            {name: 'Wai-O-Tapu', desc: '彩色香檳池地熱。', type: 'view', tip: '硫磺味重，但景色特別。'},
-                            {name: 'ZORB 水球', desc: '人進球裡滾下山坡。', type: 'fun', tip: '記得帶泳衣毛巾。'}
+                            {name: 'Lady Knox 間歇泉', desc: '10:15 噴發，09:30 前卡位。', type: 'view', query: 'Lady Knox Geyser'},
+                            {name: 'Wai-O-Tapu', desc: '走彩色地熱區 1.5-2 小時。', type: 'view', query: 'Wai-O-Tapu Thermal Wonderland'},
+                            {name: 'ZORB 水球', desc: '下午玩滾球。帶GoPro、浴巾換洗衣物。', type: 'fun', query: 'ZORB Rotorua'}
                         ]
                     },
                     {
@@ -295,37 +327,36 @@
                         km: '230km',
                         driveTime: '3h',
                         stay: '64 Federal St, Auckland',
-                        stayAddr: '64 Federal Street, Auckland',
+                        stayAddr: '64 Federal Street, Auckland, New Zealand',
                         activities: [
-                            {name: '開車北上', desc: '前往奧克蘭。', type: 'transport'},
-                            {name: '還車 & 入住', desc: '14:30 前還車。', type: 'transport'},
-                            {name: 'Federal St 晚餐', desc: '市區享用美食。', type: 'food'}
+                            {name: '前往奧克蘭', desc: '經 Hamilton 向日葵農場。', type: 'transport', query: 'Auckland', drive: '開車約 3 小時'},
+                            {name: '還車', desc: '14:30 左右還車。入住。', type: 'transport', nav: false}
                         ]
                     },
                     {
                         date: '2026-01-07',
-                        title: '千帆之都',
-                        route: '奧克蘭',
+                        title: '奧克蘭市區',
+                        route: '奧克蘭自由行',
                         km: '-',
                         driveTime: '-',
                         stay: '64 Federal St, Auckland',
-                        stayAddr: '64 Federal Street, Auckland',
+                        stayAddr: '64 Federal Street, Auckland, New Zealand',
                         activities: [
-                            {name: 'Queen Street', desc: '最後購物衝刺。', type: 'shop'},
-                            {name: 'Sky Tower', desc: '南半球最高塔。', type: 'view'},
-                            {name: 'Britomart', desc: '海港區散步。', type: 'view'}
+                            {name: '市區觀光', desc: '皇后街、天空塔、Britomart。', type: 'shop', query: 'Queen Street, Auckland'},
+                            {name: '海港橋', desc: '考慮攀登或蹦極。', type: 'fun', query: 'Auckland Harbour Bridge'},
+                            {name: '預約車子', desc: '記得預約明天去機場的車。', type: 'transport', nav: false}
                         ]
                     },
                     {
                         date: '2026-01-08',
-                        title: '再見紐西蘭',
+                        title: '回家囉',
                         route: 'AKL -> TPE',
                         km: '-',
                         driveTime: '-',
                         stay: '-',
                         activities: [
-                            {name: '前往機場', desc: '搭機返台。', type: 'transport'},
-                            {name: 'Sweet Home', desc: '10:45 起飛。', type: 'transport'}
+                            {name: '前往機場', desc: '搭機返台。', type: 'transport', query: 'Auckland Airport'},
+                            {name: '起飛', desc: '10:45 飛機。', type: 'transport', nav: false}
                         ]
                     }
                 ],
@@ -333,8 +364,6 @@
                 init() {
                     this.updateCurrentDay();
                     if (isNaN(this.currentDayNum) || this.currentDayNum < 1) this.currentDayNum = 1;
-                    
-                    // Watch for ledger changes to save persistence
                     this.$watch('ledger', (val) => {
                         localStorage.setItem('nz_ledger', JSON.stringify(val));
                     });
@@ -344,7 +373,6 @@
                     const startDate = new Date('2025-12-21');
                     const today = new Date();
                     if (isNaN(today.getTime())) return;
-                    
                     const diffTime = today - startDate;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
                     this.currentDayNum = diffDays;
@@ -371,7 +399,20 @@
                 },
 
                 toggleDay(index) {
-                    this.openDay = (this.openDay === index) ? -1 : index;
+                    if (this.openDay === index) {
+                        this.openDay = -1;
+                    } else {
+                        this.openDay = index;
+                        // 解決畫面跳動：平滑捲動到卡片頂部
+                        setTimeout(() => {
+                            const element = document.getElementById('day-' + index);
+                            if (element) {
+                                // 減去 header 高度 (約 100px) 加上一點緩衝
+                                const y = element.getBoundingClientRect().top + window.scrollY - 110; 
+                                window.scrollTo({top: y, behavior: 'smooth'});
+                            }
+                        }, 100);
+                    }
                 },
 
                 formatDate(dateStr) {
@@ -391,7 +432,9 @@
                 },
 
                 getMapLink(query) {
-                    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query + ' New Zealand')}`;
+                    if (!query) return '#';
+                    // Reverted back to search mode for previewing from Taiwan
+                    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
                 },
                 
                 getDotColor(type) {
@@ -690,6 +733,17 @@
             margin-top: 8px;
             line-height: 1.4;
         }
+        
+        /* Drive Time Box */
+        .drive-box {
+            font-size: 10px;
+            color: #666;
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 4px;
+            display: inline-block;
+        }
 
         /* Bottom Nav (Wider) */
         .bottom-nav {
@@ -834,7 +888,7 @@
 
             <!-- Days List -->
             <template x-for="(day, index) in days" :key="index">
-                <div class="card" :class="{'expanded': openDay === index, 'past': isPast(day.date) && openDay !== index}">
+                <div :id="'day-' + index" class="card" :class="{'expanded': openDay === index, 'past': isPast(day.date) && openDay !== index}">
                     
                     <!-- Card Header -->
                     <div @click="toggleDay(index)" class="p-5 flex items-center justify-between" style="cursor: pointer;">
@@ -872,6 +926,12 @@
                                         
                                         <div class="activity-content">
                                             <div style="flex:1; min-width:0;">
+                                                <!-- Drive Time Badge (Displayed above activity) -->
+                                                <div x-show="item.drive" class="drive-box" style="margin-bottom: 6px;">
+                                                    <i class="fa-solid fa-car-side" style="margin-right: 4px;"></i>
+                                                    <span x-text="item.drive"></span>
+                                                </div>
+
                                                 <div style="font-weight:700; font-size:14px; margin-bottom:4px;" x-text="item.name"></div>
                                                 <div style="font-size:12px; color:#666; line-height:1.5;" x-text="item.desc"></div>
                                                 
@@ -880,7 +940,8 @@
                                                     <span x-text="item.tip"></span>
                                                 </div>
                                             </div>
-                                            <a :href="getMapLink(item.name)" target="_blank" class="map-btn">
+                                            <!-- Conditional Nav Button -->
+                                            <a x-show="item.nav !== false" :href="getMapLink(item.query || item.name)" target="_blank" class="map-btn">
                                                 <i class="fa-solid fa-location-arrow" style="font-size:12px;"></i>
                                             </a>
                                         </div>
@@ -897,6 +958,8 @@
                                     <div style="flex:1;">
                                         <div style="font-size:10px; font-weight:700; color:#818cf8; text-transform:uppercase;">Tonight's Stay</div>
                                         <div style="font-size:14px; font-weight:700; color:#333;" x-text="day.stay"></div>
+                                        <div x-show="day.stayAddr" style="font-size:12px; color:#666; margin-top:4px;" x-text="day.stayAddr"></div>
+                                        <a x-show="day.stayAddr" :href="getMapLink(day.stayAddr)" target="_blank" style="display:inline-block; margin-top:8px; font-size:12px; font-weight:700; color:#6366f1; text-decoration:none;">導航去住宿 &rarr;</a>
                                     </div>
                                 </div>
                             </div>
@@ -909,7 +972,7 @@
 
         <!-- 2. GUIDE VIEW -->
         <div x-show="activeTab === 'guide'" x-transition.opacity>
-            
+            <!-- ... existing guide content ... -->
             <!-- Weather Forecast Widget -->
             <div class="card p-5" style="background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%); border:none;">
                 <h3 class="font-serif" style="margin-bottom:12px; color:#0e7490;">天氣預報</h3>
@@ -987,6 +1050,7 @@
 
         <!-- 3. BUDGET (LEDGER) VIEW -->
         <div x-show="activeTab === 'budget'" x-transition.opacity>
+            <!-- ... existing budget content ... -->
             <div class="card" style="overflow:hidden;">
                 <!-- Total Header -->
                 <div style="background:#2C3E50; color:white; padding:24px; position:relative;">
