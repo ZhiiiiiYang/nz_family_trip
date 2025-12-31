@@ -9,11 +9,11 @@
     
     <!-- App Icon & Title (iOS Home Screen) -->
     <meta name="apple-mobile-web-app-title" content="NZ Family Trip">
-    <link rel="apple-touch-icon" sizes="128x128" href="icon3.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="shortcut icon" type="image/png" href="icon.png">
 
-    <title>紐西蘭南北島・家族大旅行</title>
+    <title>紐西蘭南北島・家庭旅行</title>
     
     <!-- FontAwesome (Icons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -253,14 +253,14 @@
                         route: 'CHC -> WLG -> Ohakune',
                         km: '290km',
                         driveTime: '4h',
-                        stay: 'Ohakune Carrot Park',
-                        stayAddr: 'Ohakune Carrot Adventure Park, New Zealand',
+                        stay: '94 Clyde Street, Ohakune',
+                        stayAddr: '94 Clyde Street, Ohakune 4625, New Zealand',
                         activities: [
-                            {name: '前往機場', desc: '10:00 退房預約車子去機場。', type: 'transport', query: 'Christchurch Airport'},
+                            {name: '前往機場', desc: '09:30 坐車去機場。', type: 'transport', query: 'Christchurch Airport'},
                             {name: '飛往威靈頓', desc: '12:15 飛 -> 13:30 到。', type: 'transport', nav: false},
                             {name: '租車北上', desc: '14:30 租完車。確認延後還車計價。', type: 'transport', query: 'Wellington Airport Car Rental'},
-                            {name: '前往 Ohakune', desc: '開4小時(中途 Wild Bean Café 休息)。', type: 'transport', nav: false, drive: '開車約 4 小時'},
-                            {name: '入住', desc: '胡蘿蔔公園後面。無冷氣有風扇。', type: 'stay', query: 'Ohakune Carrot Adventure Park'}
+                            {name: '前往 Ohakune', desc: '開4小時。中途 Wild Bean Café 休息 (3.5h)，若去北帕默斯頓維多利亞花園則 4h。', type: 'transport', nav: false, drive: '開車約 4 小時'},
+                            {name: '入住', desc: '胡蘿蔔公園後面。無冷氣有風扇。', type: 'stay', query: '94 Clyde Street, Ohakune 4625'}
                         ]
                     },
                     {
@@ -275,7 +275,8 @@
                             {name: 'Ruapehu 火山', desc: 'Iwikau Village 看全貌。Meads Wall 步道(15分)。', type: 'view', query: 'Iwikau Village', drive: '開車約 45 分'},
                             {name: '瀑布步道', desc: 'Tawhai Falls (20分) 或 Taranaki Falls (2-3小時)。', type: 'hike', query: 'Taranaki Falls Track'},
                             {name: '前往陶波', desc: '下午開 1.5 小時。', type: 'transport', nav: false, drive: '開車約 1.5 小時'},
-                            {name: 'Huka Prawn Park', desc: '吃蝦、釣蝦、玩水槍(帶衣物)。', type: 'fun', query: 'Huka Prawn Park'}
+                            {name: '湖卡瀑布', desc: '觀賞壯觀的湖卡瀑布。', type: 'view', query: 'Huka Falls'},
+                            {name: 'Huka Prawn Park', desc: '撈蝦烤蝦、吃蒜香奶油蝦、蝦漢堡蝦沙拉。', type: 'fun', query: 'Huka Prawn Park'}
                         ]
                     },
                     {
@@ -288,8 +289,8 @@
                         stayAddr: '4 Westbourne Avenue, Rotorua, New Zealand',
                         activities: [
                             {name: '前往羅托魯瓦', desc: '經 Wildwood Farm 花卉農場。', type: 'transport', query: 'Wildwood Farm', drive: '開車約 1 小時'},
-                            {name: 'Skyline', desc: '空中纜車+5圈滑板車 (約3小時)。', type: 'fun', query: 'Skyline Rotorua'},
-                            {name: '紅木森林', desc: 'Redwoods Treewalk 夜間點燈步道。', type: 'view', query: 'Redwoods Treewalk'}
+                            {name: 'Skyline', desc: '空中纜車+5圈滑板車。若今日有空可先去 Heritage 農場。', type: 'fun', query: 'Skyline Rotorua'},
+                            {name: '紅木森林', desc: '夜間點燈步道 (可彈性安排在 1/4 或 1/5 晚上)。', type: 'view', query: 'Redwoods Treewalk'}
                         ]
                     },
                     {
@@ -303,7 +304,7 @@
                         activities: [
                             {name: '樹冠層滑索', desc: '09:15 Canopy Tours (3.5小時)。', type: 'fun', query: 'Rotorua Canopy Tours'},
                             {name: '地獄之門', desc: '午餐後去地熱區及泥浴體驗。', type: 'view', query: 'Hells Gate Geothermal Park'},
-                            {name: 'Heritage 農場', desc: '16:00 前去與動物互動。', type: 'fun', query: 'Agrodome'}
+                            {name: 'Heritage 農場', desc: '16:00 前到達 (來不及可致電延至 16:30)。若瓦納卡看過羊駝可放棄。', type: 'fun', query: 'Agrodome'}
                         ]
                     },
                     {
@@ -317,7 +318,7 @@
                         activities: [
                             {name: 'Lady Knox 間歇泉', desc: '10:15 噴發，09:30 前卡位。', type: 'view', query: 'Lady Knox Geyser'},
                             {name: 'Wai-O-Tapu', desc: '走彩色地熱區 1.5-2 小時。', type: 'view', query: 'Wai-O-Tapu Thermal Wonderland'},
-                            {name: 'ZORB 水球', desc: '下午玩滾球。帶GoPro、浴巾換洗衣物。', type: 'fun', query: 'ZORB Rotorua'}
+                            {name: 'ZORB 水球', desc: '下午玩滾球。留一小時可體驗二次。帶GoPro、浴巾。', type: 'fun', query: 'ZORB Rotorua'}
                         ]
                     },
                     {
@@ -329,7 +330,7 @@
                         stay: '64 Federal St, Auckland',
                         stayAddr: '64 Federal Street, Auckland, New Zealand',
                         activities: [
-                            {name: '前往奧克蘭', desc: '經 Hamilton 向日葵農場。', type: 'transport', query: 'Auckland', drive: '開車約 3 小時'},
+                            {name: '前往奧克蘭機場', desc: '經 Hamilton 向日葵農場。', type: 'transport', query: 'Auckland Airport', drive: '開車約 3 小時'},
                             {name: '還車', desc: '14:30 左右還車。入住。', type: 'transport', nav: false}
                         ]
                     },
