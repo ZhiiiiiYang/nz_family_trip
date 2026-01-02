@@ -9,11 +9,11 @@
     
     <!-- App Icon & Title (iOS Home Screen) -->
     <meta name="apple-mobile-web-app-title" content="NZ Family Trip">
-    <link rel="apple-touch-icon" sizes="128x128" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="shortcut icon" type="image/png" href="icon.png">
 
-    <title>紐西蘭南北島・家庭旅行</title>
+    <title>紐西蘭南北島・家庭大旅行</title>
     
     <!-- FontAwesome (Icons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,59 +24,9 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('itineraryApp', () => ({
-                activeTab: 'itinerary',
                 openDay: 0, 
                 currentDayNum: 1,
                 
-                // Ledger Data
-                ledger: JSON.parse(localStorage.getItem('nz_ledger')) || [
-                    {id: 1, name: '米佛峽灣遊船', cost: 570},
-                    {id: 2, name: 'RealNZ 螢火蟲洞', cost: 2360},
-                    {id: 3, name: '企鵝歸巢', cost: 735},
-                    {id: 4, name: 'Heritage 農場', cost: 855},
-                    {id: 5, name: '終極樹冠之旅', cost: 4613},
-                    {id: 6, name: '空中纜車+滑板車', cost: 1629},
-                    {id: 7, name: 'ZORB 水球', cost: 1692},
-                    {id: 8, name: '凱庫拉賞鯨', cost: 0} 
-                ],
-                newEntryName: '',
-                newEntryCost: '',
-
-                // Weather Data
-                weatherSouth: [
-                    {day: '今天', icon: 'fa-sun', temp: '18°C', desc: '基督城/晴朗'},
-                    {day: '明天', icon: 'fa-cloud-sun', temp: '16°C', desc: '蒂卡波/多雲'},
-                    {day: '週三', icon: 'fa-cloud-rain', temp: '14°C', desc: '峽灣/有雨'},
-                ],
-                weatherNorth: [
-                    {day: '今天', icon: 'fa-sun', temp: '24°C', desc: '奧克蘭/熱'},
-                    {day: '明天', icon: 'fa-sun', temp: '25°C', desc: '羅托魯瓦/晴'},
-                    {day: '週三', icon: 'fa-cloud-sun', temp: '23°C', desc: '陶波/舒適'},
-                ],
-
-                // Souvenirs
-                souvenirs: [
-                    {name: 'Whittaker\'s 巧克力', desc: '超市必掃，推Hokey Pokey口味', icon: 'fa-candy-cane', color: '#5D4037'},
-                    {name: 'Manuka 麥盧卡蜂蜜', desc: '認明UMF/MGO認證', icon: 'fa-jar', color: '#F59E0B'},
-                    {name: 'Cookie Time', desc: '國民餅乾，微波加熱更好吃', icon: 'fa-cookie-bite', color: '#D97706'},
-                    {name: 'Lanolin 綿羊油', desc: '保濕神物，價格親民', icon: 'fa-bottle-droplet', color: '#3B82F6'},
-                    {name: '羊駝/羊毛製品', desc: '輕薄保暖，適合長輩', icon: 'fa-socks', color: '#6B7280'},
-                ],
-
-                // Extra Trips
-                extraTrips: [
-                    {name: 'Arrowtown 箭鎮', region: '近皇后鎮', desc: '魔戒取景地，淘金歷史古鎮', query: 'Arrowtown'},
-                    {name: 'Mt. John 天文台', region: '蒂卡波', desc: '俯瞰牛奶湖的最佳制高點(下午3點關)', query: 'Mount John Observatory'},
-                    {name: 'Hell\'s Gate 地獄之門', region: '羅托魯瓦', desc: '泥漿浴溫泉體驗', query: 'Hells Gate Geothermal Park'},
-                    {name: 'Kaikoura Peninsula', region: '凱庫拉', desc: '海豹步道', query: 'Kaikoura Peninsula Walkway'},
-                ],
-
-                tabs: [
-                    {id: 'itinerary', name: '每日行程'},
-                    {id: 'guide', name: '旅遊攻略'},
-                    {id: 'budget', name: '記帳本'}
-                ],
-
                 days: [
                     {
                         date: '2025-12-21',
@@ -364,56 +314,44 @@
 
                 init() {
                     this.updateCurrentDay();
-                    if (isNaN(this.currentDayNum) || this.currentDayNum < 1) this.currentDayNum = 1;
-                    this.$watch('ledger', (val) => {
-                        localStorage.setItem('nz_ledger', JSON.stringify(val));
-                    });
+                    this.scrollToToday();
                 },
 
                 updateCurrentDay() {
                     const startDate = new Date('2025-12-21');
                     const today = new Date();
                     if (isNaN(today.getTime())) return;
+                    
                     const diffTime = today - startDate;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
                     this.currentDayNum = diffDays;
                 },
 
-                // CRUD Logic
-                addLedgerItem() {
-                    if(!this.newEntryName || !this.newEntryCost) return;
-                    this.ledger.push({
-                        id: Date.now(),
-                        name: this.newEntryName,
-                        cost: parseInt(this.newEntryCost)
-                    });
-                    this.newEntryName = '';
-                    this.newEntryCost = '';
-                },
+                scrollToToday() {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const dateStr = `${year}-${month}-${day}`;
 
-                removeLedgerItem(id) {
-                    this.ledger = this.ledger.filter(item => item.id !== id);
-                },
-
-                getTotalCost() {
-                    return this.ledger.reduce((sum, item) => sum + (parseInt(item.cost) || 0), 0).toLocaleString();
-                },
-
-                toggleDay(index) {
-                    if (this.openDay === index) {
-                        this.openDay = -1;
-                    } else {
+                    const index = this.days.findIndex(d => d.date === dateStr);
+                    
+                    if (index !== -1) {
                         this.openDay = index;
-                        // 解決畫面跳動：平滑捲動到卡片頂部
+                        // Wait for render, then scroll to the specific day card
                         setTimeout(() => {
                             const element = document.getElementById('day-' + index);
                             if (element) {
-                                // 減去 header 高度 (約 100px) 加上一點緩衝
+                                // Calculate offset to handle sticky header (approx 100px)
                                 const y = element.getBoundingClientRect().top + window.scrollY - 110; 
                                 window.scrollTo({top: y, behavior: 'smooth'});
                             }
-                        }, 100);
+                        }, 500);
                     }
+                },
+
+                toggleDay(index) {
+                    this.openDay = (this.openDay === index) ? -1 : index;
                 },
 
                 formatDate(dateStr) {
@@ -428,13 +366,12 @@
                 
                 isPast(dateStr) {
                     const date = new Date(dateStr);
-                    const today = new Date('2025-12-22');
+                    const today = new Date(); // Use actual today for styling
                     return date < today;
                 },
 
                 getMapLink(query) {
                     if (!query) return '#';
-                    // Reverted back to search mode for previewing from Taiwan
                     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
                 },
                 
@@ -483,7 +420,8 @@
             font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-main);
             -webkit-font-smoothing: antialiased;
-            padding-bottom: calc(90px + var(--safe-bottom));
+            /* No navigation bar, less padding needed */
+            padding-bottom: calc(40px + var(--safe-bottom)); 
             min-height: 100vh;
             min-height: 100dvh;
         }
@@ -552,48 +490,11 @@
 
         /* Main Container */
         main {
-            margin-top: calc(90px + var(--safe-top));
+            margin-top: calc(100px + var(--safe-top)); /* Slightly more space */
             padding: 0 16px;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-        }
-
-        /* Tabs */
-        .tabs-container {
-            position: sticky;
-            top: calc(75px + var(--safe-top));
-            z-index: 40;
-            background: linear-gradient(to bottom, var(--bg) 80%, transparent);
-            padding: 10px 0;
-            margin: 0 -16px 16px -16px; 
-            padding-left: 16px; 
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .tabs-container::-webkit-scrollbar { display: none; }
-
-        .tab-btn {
-            background: #fff;
-            border: 1px solid rgba(0,0,0,0.05);
-            padding: 8px 16px;
-            border-radius: 999px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #999;
-            white-space: nowrap;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: #fff;
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(93, 126, 104, 0.3);
         }
 
         /* Card Style */
@@ -746,79 +647,6 @@
             display: inline-block;
         }
 
-        /* Bottom Nav (Wider) */
-        .bottom-nav {
-            position: fixed;
-            bottom: calc(20px + var(--safe-bottom));
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(44, 62, 80, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 12px 0;
-            width: 90%;
-            max-width: 450px;
-            border-radius: 99px;
-            display: flex;
-            justify-content: space-around;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-            z-index: 100;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .nav-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 500;
-            width: 60px;
-        }
-        
-        .nav-btn i { font-size: 20px; margin-bottom: 4px; transition: transform 0.2s; }
-        .nav-btn.active { color: var(--secondary); font-weight: 700; }
-        .nav-btn.active i { transform: translateY(-2px); }
-
-        /* Budget Table & Form */
-        .budget-table { width: 100%; border-collapse: collapse; }
-        .budget-table th { text-align: left; padding: 12px 16px; background: #f9fafb; font-size: 12px; color: #6b7280; text-transform: uppercase; }
-        .budget-table td { padding: 14px 16px; border-bottom: 1px solid #f3f4f6; font-size: 14px; vertical-align: middle; }
-        .budget-table td:nth-child(2) { text-align: right; font-weight: 700; font-family: monospace; }
-        .budget-table td:last-child { width: 40px; text-align: center; }
-        
-        .delete-btn { color: #ef4444; background: none; border: none; font-size: 14px; padding: 8px; cursor: pointer; opacity: 0.5; }
-        .delete-btn:active { opacity: 1; }
-        
-        .add-form { background: #f3f4f6; padding: 16px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #e5e7eb; }
-        .form-input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; outline: none; }
-        .form-input:focus { border-color: var(--primary); }
-        .add-btn { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-        /* Weather Forecast UI */
-        .forecast-container { display: flex; flex-direction: column; gap: 12px; }
-        .forecast-row { display: flex; align-items: center; background: rgba(255,255,255,0.7); padding: 10px 15px; border-radius: 12px; justify-content: space-between; }
-        .forecast-date { font-weight: bold; font-size: 14px; color: #333; width: 40px; }
-        .forecast-icon { font-size: 18px; color: #fbbf24; width: 30px; text-align: center; }
-        .forecast-temp { font-weight: bold; font-size: 16px; color: #333; width: 50px; text-align: right; }
-        .forecast-desc { font-size: 12px; color: #666; text-align: right; flex: 1; }
-        .island-title { font-size: 12px; font-weight: 700; color: #666; margin: 10px 0 5px 5px; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Souvenir List */
-        .souvenir-item { display: flex; align-items: center; background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .souvenir-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; margin-right: 12px; flex-shrink: 0; }
-        .souvenir-info h4 { font-size: 14px; margin-bottom: 2px; }
-        .souvenir-info p { font-size: 11px; color: #666; margin: 0; }
-
-        /* Extra Trip Card */
-        .trip-card { background: white; border-radius: 16px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; }
-        .trip-info h4 { font-size: 15px; color: #333; margin-bottom: 4px; }
-        .trip-info .tag { font-size: 10px; background: #e0f2f1; color: #0f766e; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
-        .trip-info p { font-size: 12px; color: #666; margin: 0; }
-        .nav-round-btn { background: #f3f4f6; color: var(--primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-
     </style>
 </head>
 <body x-data="itineraryApp" x-cloak>
@@ -840,279 +668,147 @@
     <!-- Main Content -->
     <main>
 
-        <!-- Tab Navigation -->
-        <div class="tabs-container">
-            <template x-for="tab in tabs">
-                <button 
-                    @click="activeTab = tab.id; window.scrollTo({top: 0, behavior: 'smooth'})"
-                    class="tab-btn"
-                    :class="activeTab === tab.id ? 'active' : ''"
-                    x-text="tab.name">
-                </button>
-            </template>
-        </div>
-
-        <!-- 1. ITINERARY VIEW -->
-        <div x-show="activeTab === 'itinerary'" x-transition.opacity>
+        <!-- Flight Card -->
+        <div class="card flight-card p-5">
+            <div class="flex justify-between items-center mb-4">
+                <span style="background:#6B8E9B; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">FLIGHT</span>
+                <span style="font-size:12px; color:#999; font-family:monospace;">TRIP START</span>
+            </div>
             
-            <!-- Flight Card -->
-            <div class="card flight-card p-5">
-                <div class="flex justify-between items-center mb-4">
-                    <span style="background:#6B8E9B; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">FLIGHT</span>
-                    <span style="font-size:12px; color:#999; font-family:monospace;">TRIP START</span>
+            <div class="flex items-center justify-between">
+                <div class="text-center">
+                    <div style="font-size:24px; font-weight:700;">TPE</div>
+                    <div style="font-size:12px; color:#666;">台北</div>
                 </div>
                 
-                <div class="flex items-center justify-between">
-                    <div class="text-center">
-                        <div style="font-size:24px; font-weight:700;">TPE</div>
-                        <div style="font-size:12px; color:#666;">台北</div>
-                    </div>
-                    
-                    <div class="flight-line">
-                        <i class="fa-solid fa-plane plane-icon-center"></i>
-                    </div>
-                    
-                    <div class="text-center">
-                        <div style="font-size:24px; font-weight:700;">AKL</div>
-                        <div style="font-size:12px; color:#666;">奧克蘭</div>
-                    </div>
+                <div class="flight-line">
+                    <i class="fa-solid fa-plane plane-icon-center"></i>
                 </div>
-
-                <div class="tip-box" style="width:100%; border-color:#fecaca; background:#fef2f2; color:#b91c1c; margin-top:16px;">
-                    <i class="fa-solid fa-triangle-exclamation" style="margin-right:6px; margin-top:2px;"></i> 
-                    <div>
-                        <span style="font-weight:bold; display:block;">轉機重要提醒</span>
-                        在奧克蘭必須 <span style="text-decoration:underline;">提領行李</span> 並重新check-in國內線！
-                    </div>
+                
+                <div class="text-center">
+                    <div style="font-size:24px; font-weight:700;">AKL</div>
+                    <div style="font-size:12px; color:#666;">奧克蘭</div>
                 </div>
             </div>
 
-            <!-- Days List -->
-            <template x-for="(day, index) in days" :key="index">
-                <div :id="'day-' + index" class="card" :class="{'expanded': openDay === index, 'past': isPast(day.date) && openDay !== index}">
-                    
-                    <!-- Card Header -->
-                    <div @click="toggleDay(index)" class="p-5 flex items-center justify-between" style="cursor: pointer;">
-                        <div class="flex items-center" style="gap: 16px;">
-                            <div class="date-badge" :class="{'active': openDay === index}">
-                                <span x-text="formatMonth(day.date)"></span>
-                                <span x-text="formatDate(day.date)"></span>
-                            </div>
-                            <div style="min-width: 0; flex: 1;"> <!-- Fix for text overflow -->
-                                <h3 style="font-size:16px; margin-bottom:4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="day.title"></h3>
-                                <div style="font-size:12px; color:#666; display:flex; items-align:center;">
-                                    <span style="width:6px; height:6px; background:var(--secondary); border-radius:50%; margin-right:6px; margin-top:5px;"></span>
-                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="day.route"></span>
-                                </div>
+            <div class="tip-box" style="width:100%; border-color:#fecaca; background:#fef2f2; color:#b91c1c; margin-top:16px;">
+                <i class="fa-solid fa-triangle-exclamation" style="margin-right:6px; margin-top:2px;"></i> 
+                <div>
+                    <span style="font-weight:bold; display:block;">轉機重要提醒</span>
+                    在奧克蘭必須 <span style="text-decoration:underline;">提領行李</span> 並重新check-in國內線！
+                </div>
+            </div>
+        </div>
+
+        <!-- Days List -->
+        <template x-for="(day, index) in days" :key="index">
+            <div :id="'day-' + index" class="card" :class="{'expanded': openDay === index, 'past': isPast(day.date) && openDay !== index}">
+                
+                <!-- Card Header -->
+                <div @click="toggleDay(index)" class="p-5 flex items-center justify-between" style="cursor: pointer;">
+                    <div class="flex items-center" style="gap: 16px;">
+                        <div class="date-badge" :class="{'active': openDay === index}">
+                            <span x-text="formatMonth(day.date)"></span>
+                            <span x-text="formatDate(day.date)"></span>
+                        </div>
+                        <div style="min-width: 0; flex: 1;"> <!-- Fix for text overflow -->
+                            <h3 style="font-size:16px; margin-bottom:4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="day.title"></h3>
+                            <div style="font-size:12px; color:#666; display:flex; items-align:center;">
+                                <span style="width:6px; height:6px; background:var(--secondary); border-radius:50%; margin-right:6px; margin-top:5px;"></span>
+                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="day.route"></span>
                             </div>
                         </div>
-                        <i class="fa-solid fa-chevron-down" style="color:#ccc; transition:0.3s;" :style="openDay === index ? 'transform:rotate(180deg); color:var(--primary)' : ''"></i>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="color:#ccc; transition:0.3s;" :style="openDay === index ? 'transform:rotate(180deg); color:var(--primary)' : ''"></i>
+                </div>
+
+                <!-- Card Body -->
+                <div x-show="openDay === index" x-collapse style="border-top:1px solid #f3f4f6;">
+                    <!-- Transport Info -->
+                    <div class="px-4 py-2" style="background:#f9fafb; display:flex; gap:20px; font-size:12px; color:#666; font-weight:500;">
+                        <span x-show="day.km !== '-'"><i class="fa-solid fa-road mr-2"></i> <span x-text="day.km"></span></span>
+                        <span x-show="day.driveTime !== '-'"><i class="fa-regular fa-clock mr-2"></i> <span x-text="day.driveTime"></span></span>
                     </div>
 
-                    <!-- Card Body -->
-                    <div x-show="openDay === index" x-collapse style="border-top:1px solid #f3f4f6;">
-                        <!-- Transport Info -->
-                        <div class="px-4 py-2" style="background:#f9fafb; display:flex; gap:20px; font-size:12px; color:#666; font-weight:500;">
-                            <span x-show="day.km !== '-'"><i class="fa-solid fa-road mr-2"></i> <span x-text="day.km"></span></span>
-                            <span x-show="day.driveTime !== '-'"><i class="fa-regular fa-clock mr-2"></i> <span x-text="day.driveTime"></span></span>
-                        </div>
-
-                        <!-- Timeline -->
-                        <div class="p-5">
-                            <div class="timeline-container">
-                                <template x-for="(item, idx) in day.activities">
-                                    <div class="timeline-item">
-                                        <div class="timeline-line"></div>
-                                        <div class="timeline-dot" :class="getDotColor(item.type)"></div>
-                                        
-                                        <div class="activity-content">
-                                            <div style="flex:1; min-width:0;">
-                                                <!-- Drive Time Badge (Displayed above activity) -->
-                                                <div x-show="item.drive" class="drive-box" style="margin-bottom: 6px;">
-                                                    <i class="fa-solid fa-car-side" style="margin-right: 4px;"></i>
-                                                    <span x-text="item.drive"></span>
-                                                </div>
-
-                                                <div style="font-weight:700; font-size:14px; margin-bottom:4px;" x-text="item.name"></div>
-                                                <div style="font-size:12px; color:#666; line-height:1.5;" x-text="item.desc"></div>
-                                                
-                                                <div x-show="item.tip" class="tip-box">
-                                                    <i class="fa-solid fa-lightbulb" style="margin-right:6px; color:#f59e0b;"></i>
-                                                    <span x-text="item.tip"></span>
-                                                </div>
+                    <!-- Timeline -->
+                    <div class="p-5">
+                        <div class="timeline-container">
+                            <template x-for="(item, idx) in day.activities">
+                                <div class="timeline-item">
+                                    <div class="timeline-line"></div>
+                                    <div class="timeline-dot" :class="getDotColor(item.type)"></div>
+                                    
+                                    <div class="activity-content">
+                                        <div style="flex:1; min-width:0;">
+                                            <!-- Drive Time Badge (Displayed above activity) -->
+                                            <div x-show="item.drive" class="drive-box" style="margin-bottom: 6px;">
+                                                <i class="fa-solid fa-car-side" style="margin-right: 4px;"></i>
+                                                <span x-text="item.drive"></span>
                                             </div>
-                                            <!-- Conditional Nav Button -->
-                                            <a x-show="item.nav !== false" :href="getMapLink(item.query || item.name)" target="_blank" class="map-btn">
-                                                <i class="fa-solid fa-location-arrow" style="font-size:12px;"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
 
-                            <!-- Stay Info -->
-                            <div x-show="day.stay && day.stay !== '-'" style="margin-top:10px; padding-top:16px; border-top:1px solid #f3f4f6;">
-                                <div style="display:flex; background:#eef2ff; border-radius:12px; padding:12px; border:1px solid #e0e7ff;">
-                                    <div style="width:32px; height:32px; background:#e0e7ff; color:#6366f1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:12px;">
-                                        <i class="fa-solid fa-bed" style="font-size:12px;"></i>
+                                            <div style="font-weight:700; font-size:14px; margin-bottom:4px;" x-text="item.name"></div>
+                                            <div style="font-size:12px; color:#666; line-height:1.5;" x-text="item.desc"></div>
+                                            
+                                            <div x-show="item.tip" class="tip-box">
+                                                <i class="fa-solid fa-lightbulb" style="margin-right:6px; color:#f59e0b;"></i>
+                                                <span x-text="item.tip"></span>
+                                            </div>
+                                        </div>
+                                        <!-- Conditional Nav Button -->
+                                        <a x-show="item.nav !== false" :href="getMapLink(item.query || item.name)" target="_blank" class="map-btn">
+                                            <i class="fa-solid fa-location-arrow" style="font-size:12px;"></i>
+                                        </a>
                                     </div>
-                                    <div style="flex:1;">
-                                        <div style="font-size:10px; font-weight:700; color:#818cf8; text-transform:uppercase;">Tonight's Stay</div>
-                                        <div style="font-size:14px; font-weight:700; color:#333;" x-text="day.stay"></div>
-                                        <div x-show="day.stayAddr" style="font-size:12px; color:#666; margin-top:4px;" x-text="day.stayAddr"></div>
-                                        <a x-show="day.stayAddr" :href="getMapLink(day.stayAddr)" target="_blank" style="display:inline-block; margin-top:8px; font-size:12px; font-weight:700; color:#6366f1; text-decoration:none;">導航去住宿 &rarr;</a>
-                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Stay Info -->
+                        <div x-show="day.stay && day.stay !== '-'" style="margin-top:10px; padding-top:16px; border-top:1px solid #f3f4f6;">
+                            <div style="display:flex; background:#eef2ff; border-radius:12px; padding:12px; border:1px solid #e0e7ff;">
+                                <div style="width:32px; height:32px; background:#e0e7ff; color:#6366f1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:12px;">
+                                    <i class="fa-solid fa-bed" style="font-size:12px;"></i>
+                                </div>
+                                <div style="flex:1;">
+                                    <div style="font-size:10px; font-weight:700; color:#818cf8; text-transform:uppercase;">Tonight's Stay</div>
+                                    <div style="font-size:14px; font-weight:700; color:#333;" x-text="day.stay"></div>
+                                    <div x-show="day.stayAddr" style="font-size:12px; color:#666; margin-top:4px;" x-text="day.stayAddr"></div>
+                                    <a x-show="day.stayAddr" :href="getMapLink(day.stayAddr)" target="_blank" style="display:inline-block; margin-top:8px; font-size:12px; font-weight:700; color:#6366f1; text-decoration:none;">導航去住宿 &rarr;</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </template>
-            <div style="height: 40px;"></div>
+            </div>
+        </template>
+        
+        <!-- Trip End Card -->
+        <div class="card flight-card p-5" style="margin-top: 20px;">
+            <div class="flex justify-between items-center mb-4">
+                <span style="background:#6B8E9B; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">FLIGHT</span>
+                <span style="font-size:12px; color:#999; font-family:monospace;">TRIP END</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="text-center">
+                    <div style="font-size:24px; font-weight:700;">AKL</div>
+                    <div style="font-size:12px; color:#666;">奧克蘭</div>
+                </div>
+                <div class="flight-line">
+                    <i class="fa-solid fa-plane plane-icon-center" style="transform: translateX(-50%) rotate(180deg);"></i>
+                </div>
+                <div class="text-center">
+                    <div style="font-size:24px; font-weight:700;">TPE</div>
+                    <div style="font-size:12px; color:#666;">台北</div>
+                </div>
+            </div>
+            <div class="text-center mt-4" style="font-size:12px; color:#666;">
+                <i class="fa-regular fa-clock mr-1"></i> 10:45 起飛
+            </div>
         </div>
 
-        <!-- 2. GUIDE VIEW -->
-        <div x-show="activeTab === 'guide'" x-transition.opacity>
-            <!-- ... existing guide content ... -->
-            <!-- Weather Forecast Widget -->
-            <div class="card p-5" style="background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%); border:none;">
-                <h3 class="font-serif" style="margin-bottom:12px; color:#0e7490;">天氣預報</h3>
-                
-                <!-- South Island -->
-                <div class="island-title">南島 (基督城/皇后鎮)</div>
-                <div class="forecast-container">
-                    <template x-for="w in weatherSouth">
-                        <div class="forecast-row">
-                            <div class="forecast-date" x-text="w.day"></div>
-                            <div class="forecast-icon"><i class="fa-solid" :class="w.icon"></i></div>
-                            <div class="forecast-temp" x-text="w.temp"></div>
-                            <div class="forecast-desc" x-text="w.desc"></div>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- North Island -->
-                <div class="island-title" style="margin-top:20px;">北島 (奧克蘭/羅托魯瓦)</div>
-                <div class="forecast-container">
-                    <template x-for="w in weatherNorth">
-                        <div class="forecast-row">
-                            <div class="forecast-date" x-text="w.day"></div>
-                            <div class="forecast-icon"><i class="fa-solid" :class="w.icon"></i></div>
-                            <div class="forecast-temp" x-text="w.temp"></div>
-                            <div class="forecast-desc" x-text="w.desc"></div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <!-- Souvenirs -->
-            <h3 style="margin: 24px 0 12px 4px; font-size: 18px;">必買伴手禮清單</h3>
-            <div style="margin-bottom: 24px;">
-                <template x-for="item in souvenirs">
-                    <div class="souvenir-item">
-                        <div class="souvenir-icon" :style="`background: ${item.color}`">
-                            <i class="fa-solid" :class="item.icon"></i>
-                        </div>
-                        <div class="souvenir-info">
-                            <h4 x-text="item.name"></h4>
-                            <p x-text="item.desc"></p>
-                        </div>
-                    </div>
-                </template>
-            </div>
-
-            <!-- Extra Trips -->
-            <h3 style="margin: 0 0 12px 4px; font-size: 18px;">沿途順遊推薦</h3>
-            <div style="margin-bottom: 24px;">
-                <template x-for="trip in extraTrips">
-                    <div class="trip-card">
-                        <div class="trip-info">
-                            <span class="tag" x-text="trip.region"></span>
-                            <h4 x-text="trip.name"></h4>
-                            <p x-text="trip.desc"></p>
-                        </div>
-                        <a :href="getMapLink(trip.query)" target="_blank" class="nav-round-btn">
-                            <i class="fa-solid fa-location-dot"></i>
-                        </a>
-                    </div>
-                </template>
-            </div>
-
-            <div class="card p-5" style="border-left:4px solid #ef4444; background:#fef2f2;">
-                <h3 style="color:#b91c1c; font-size:16px; margin-bottom:12px;"><i class="fa-solid fa-car-side mr-2"></i> 自駕生死守則</h3>
-                <ul style="padding-left:20px; font-size:14px; color:#7f1d1d; line-height:1.6;">
-                    <li><strong>右駕靠左！</strong>雨刷方向燈相反。</li>
-                    <li>圓環 (Roundabout) 禮讓右方來車。</li>
-                    <li>單線橋樑看箭頭優先權。</li>
-                </ul>
-            </div>
-            <div style="height: 40px;"></div>
-        </div>
-
-        <!-- 3. BUDGET (LEDGER) VIEW -->
-        <div x-show="activeTab === 'budget'" x-transition.opacity>
-            <!-- ... existing budget content ... -->
-            <div class="card" style="overflow:hidden;">
-                <!-- Total Header -->
-                <div style="background:#2C3E50; color:white; padding:24px; position:relative;">
-                    <h3 class="font-serif">旅費總支出</h3>
-                    <div style="font-size:32px; font-weight:700; margin-top:8px;" x-text="'$' + getTotalCost()"></div>
-                    <div style="font-size:12px; opacity:0.7;">TWD (自動加總)</div>
-                    <div style="position:absolute; right:20px; top:24px; opacity:0.2; font-size:40px;">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                </div>
-
-                <!-- Add New Entry Form -->
-                <div class="add-form">
-                    <input type="text" x-model="newEntryName" placeholder="項目名稱" class="form-input" style="flex:2;">
-                    <input type="number" x-model="newEntryCost" placeholder="$" class="form-input" style="flex:1;">
-                    <button @click="addLedgerItem()" class="add-btn">
-                        <i class="fa-solid fa-plus"></i>
-                    </button>
-                </div>
-                
-                <!-- Ledger List -->
-                <table class="budget-table">
-                    <tbody>
-                        <template x-for="item in ledger" :key="item.id">
-                            <tr>
-                                <td x-text="item.name" style="color:#4b5563;"></td>
-                                <td x-text="item.cost"></td>
-                                <td>
-                                    <button @click="removeLedgerItem(item.id)" class="delete-btn">
-                                        <i class="fa-regular fa-trash-can"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-                <div style="background:#f9fafb; padding:15px; text-align:center; font-size:12px; color:#9ca3af; line-height:1.4;">
-                    資料自動儲存於此手機<br>
-                    <span style="font-size:10px;">* 請勿清除瀏覽器快取以免資料遺失</span>
-                </div>
-            </div>
-            <div style="height: 40px;"></div>
-        </div>
+        <div style="height: 40px;"></div>
 
     </main>
-
-    <!-- Bottom Nav -->
-    <nav class="bottom-nav">
-        <button @click="activeTab = 'itinerary'; window.scrollTo({top: 0, behavior: 'smooth'})" 
-                class="nav-btn" :class="activeTab === 'itinerary' ? 'active' : ''">
-            <i class="fa-solid fa-map"></i> 行程
-        </button>
-        <button @click="activeTab = 'guide'; window.scrollTo({top: 0, behavior: 'smooth'})" 
-                class="nav-btn" :class="activeTab === 'guide' ? 'active' : ''">
-            <i class="fa-solid fa-compass"></i> 攻略
-        </button>
-        <button @click="activeTab = 'budget'; window.scrollTo({top: 0, behavior: 'smooth'})" 
-                class="nav-btn" :class="activeTab === 'budget' ? 'active' : ''">
-            <i class="fa-solid fa-receipt"></i> 記帳
-        </button>
-    </nav>
 
 </body>
 </html>
